@@ -16,6 +16,8 @@ public class Withdraw {
     @Enumerated(EnumType.STRING)
     private Status withdrawStatus;
 
+    private String credential;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "username")
     private User user;

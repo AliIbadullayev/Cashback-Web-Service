@@ -14,8 +14,6 @@ public class PaymentMethod {
     private Long id;
     private String name;
 
-    private String credential;
-
     private double fee;
 
     private double minAmount;

@@ -31,7 +31,7 @@ public class ThirdPartyMarketRestController {
     }
 
     @PostMapping("/approve")
-    public ResponseEntity<?> approvePurchase(@RequestBody PurchaseApproveDto purchaseApproveDto) throws NotFoundRedirectException, NotHandledPurchaseException {
+    public ResponseEntity<?> approvePurchase(@RequestBody PurchaseApproveDto purchaseApproveDto) {
         return new ResponseEntity<>(purchaseService.approvePurchase(purchaseApproveDto), HttpStatus.OK);
     }
 }
