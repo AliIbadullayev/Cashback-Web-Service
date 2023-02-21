@@ -9,4 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/acquire/")
 public class ThirdPartyAcquireRestController {
+
 }

@@ -1,5 +1,6 @@
 package com.business.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,9 +12,11 @@ public class Marketplace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rules_id")
     private Rules rules;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
