@@ -6,7 +6,7 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "withdraw_types")
+@Table(name = "withdraw")
 @Data
 public class Withdraw {
 
