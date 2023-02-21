@@ -2,8 +2,7 @@ package com.business.app.rest;
 
 
 import com.business.app.dto.RedirectDto;
-import com.business.app.exception.RedirectAddException;
-import com.business.app.model.Marketplace;
+import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.service.MarketplaceService;
 import com.business.app.service.RedirectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class UserRestController {
     }
 
     @PostMapping("/redirect")
-    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws RedirectAddException {
+    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws NotFoundRedirectException {
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
     }
 

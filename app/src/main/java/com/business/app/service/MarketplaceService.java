@@ -16,7 +16,9 @@ public class MarketplaceService {
         return marketplaceRepository.findAll();
     }
 
-
+    public Marketplace getMarketplace(Long marketplaceId) {
+        return marketplaceRepository.findById(marketplaceId).orElse(null);
+    }
 
 
 }
