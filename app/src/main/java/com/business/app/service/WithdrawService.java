@@ -1,5 +1,6 @@
 package com.business.app.service;
 
+import com.business.app.dto.WithdrawApproveDto;
 import com.business.app.dto.WithdrawDto;
 import com.business.app.exception.NotHandledWithdrawException;
 import com.business.app.model.*;
@@ -47,6 +48,30 @@ public class WithdrawService {
         }else {
             throw new NotHandledWithdrawException("The amount to withdraw is more than available to you!");
         }
+        return withdraw;
+    }
+
+    public Withdraw getWithdraw(Long id){
+        Withdraw withdraw = withdrawRepository.findById(id).orElse(null);
+        if (withdraw != null){
+            return withdraw;
+        }else {
+            throw new NotHandledWithdrawException("Cannot found withdraw with such id!");
+        }
+    }
+
+    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto){
+        Withdraw withdraw = getWithdraw(withdrawApproveDto.getWithdrawId());
+        User user = withdraw.getUser();
+        double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
+        if (withdrawApproveDto.getIsApproved()){
+            withdraw.setWithdrawStatus(Status.APPROVED);
+        }else {
+            user.setAvailableBalance(user.getAvailableBalance() + withdrawAmount);
+            withdraw.setWithdrawStatus(Status.REJECTED);
+        }
+        userService.saveUser(user);
+        withdrawRepository.save(withdraw);
         return withdraw;
     }
 

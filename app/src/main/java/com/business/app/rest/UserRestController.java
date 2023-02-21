@@ -65,4 +65,5 @@ public class UserRestController {
     public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto)  {
         return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto), HttpStatus.OK);
     }
+
 }
