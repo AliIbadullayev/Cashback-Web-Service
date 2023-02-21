@@ -14,4 +14,10 @@ public class User {
 
     private String password;
 
+    private double availableBalance;
+    private double pendingBalance;
+
+
+
+
 }
