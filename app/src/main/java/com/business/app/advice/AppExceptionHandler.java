@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class AppExceptionHandler {
-    @ExceptionHandler({NotFoundRedirectException.class, NotHandledPurchaseException.class, NotFoundUserException.class, NotFoundPaymentMethodException.class, NotHandledWithdrawException.class})
+    @ExceptionHandler({NotFoundRedirectException.class, NotHandledPurchaseException.class, NotFoundUserException.class,
+            NotFoundPaymentMethodException.class, NotHandledWithdrawException.class, UserAlreadyExistException.class})
     public ResponseEntity<?> handleNotFoundException (RuntimeException runtimeException) {
         return new ResponseEntity<Object>(
                 runtimeException.getMessage(), HttpStatus.NOT_FOUND);
