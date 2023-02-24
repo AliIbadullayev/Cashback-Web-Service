@@ -1,26 +1,20 @@
 package com.business.app.service;
 
 import com.business.app.exception.IllegalPageParametersException;
-import com.business.app.exception.ResoureNotFoundException;
+import com.business.app.exception.ResourceNotFoundException;
 import com.business.app.model.Marketplace;
 import com.business.app.repository.MarketplaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class MarketplaceService {
     @Autowired
     MarketplaceRepository marketplaceRepository;
 
-    public List<Marketplace> getMarketplaces() {
-        return marketplaceRepository.findAll();
-    }
 
     public Page<Marketplace> getMarkeplacePage(int pageNum, int pageSize){
 
@@ -30,7 +24,7 @@ public class MarketplaceService {
 
         Page<Marketplace> resultPage = marketplaceRepository.findAll(pageRequest);
 
-        if (resultPage.getTotalPages() < pageNum) throw new ResoureNotFoundException("На указанной странице не найдено записей!");
+        if (resultPage.getTotalPages() < pageNum) throw new ResourceNotFoundException("На указанной странице не найдено записей!");
 
         return resultPage;
     }

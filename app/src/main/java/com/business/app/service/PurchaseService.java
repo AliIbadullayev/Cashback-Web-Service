@@ -3,12 +3,18 @@ package com.business.app.service;
 import com.business.app.dto.PurchaseDto;
 import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.PurchaseFromMarketplaceDto;
+import com.business.app.exception.IllegalPageParametersException;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
+import com.business.app.exception.ResourceNotFoundException;
 import com.business.app.model.*;
 import com.business.app.repository.PurchaseRepository;
 import com.business.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -18,16 +24,20 @@ import java.util.List;
 
 @Service
 public class PurchaseService {
-    @Autowired
-    RedirectService redirectService;
+    private final RedirectService redirectService;
 
-    @Autowired
-    PurchaseRepository purchaseRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public PurchaseService(RedirectService redirectService, PurchaseRepository purchaseRepository, UserRepository userRepository) {
+        this.redirectService = redirectService;
+        this.purchaseRepository = purchaseRepository;
+        this.userRepository = userRepository;
+    }
 
     private boolean checkRules(Rules rules, PurchaseFromMarketplaceDto purchase){
+        System.out.println(rules.getMinPrice()+" "+ purchase.getTotalPrice());
         return rules.getMinPrice() <= purchase.getTotalPrice();
     }
 
@@ -89,17 +99,31 @@ public class PurchaseService {
         return purchase;
     }
 
-    public List<PurchaseDto> getAllPurchasesByUser(User user){
-        List<PurchaseDto> result = new ArrayList<>();
-        for (Purchase purchase : purchaseRepository.findAllByUser(user)) {
-            result.add(PurchaseDto.fromPurchase(purchase));
+
+    public List<PurchaseDto> getPurchasePage(User user, int pageNum, int pageSize){
+
+        if (pageNum < 1 || pageSize < 1) throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
+
+        Pageable pageRequest = createPageRequest(pageNum-1, pageSize);
+
+        Page<Purchase> resultPage = purchaseRepository.findAllByUser(user,pageRequest);
+
+        if (resultPage.getTotalPages() < pageNum) throw new ResourceNotFoundException("На указанной странице не найдено записей!");
+
+        List<PurchaseDto> resultList = new ArrayList<>();
+
+        for (Purchase purchase : resultPage.getContent()) {
+            resultList.add(PurchaseDto.fromPurchase(purchase));
         }
-        return result;
+
+        return resultList;
+
     }
 
-//    private String getMarketplaceName(Long id){
-//        Marketplace marketplace = marketplaceRepository.findById(id).orElse(null);
-//        if (marketplace != null) return marketplace.getName();
-//        else return "undefined";
-//    }
+
+    private Pageable createPageRequest(int pageNum, int pageSize){
+        return PageRequest.of(pageNum,pageSize, Sort.Direction.DESC, "timestamp");
+    }
+
+
 }

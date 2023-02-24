@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
  * Контроллер для запросов со стороны платежной системы (для вывода средств)
  * */
 @RestController
-@RequestMapping(value = "/api/acquire/")
+@RequestMapping(value = "/api/acquire")
 public class ThirdPartyAcquireRestController {
     @Autowired
     WithdrawService withdrawService;
 
-    @PostMapping("/approve")
+    @PostMapping("approve-withdraw")
     public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawApproveDto withdrawApproveDto)  {
         return new ResponseEntity<>(withdrawService.approveWithdraw(withdrawApproveDto), HttpStatus.OK);
     }

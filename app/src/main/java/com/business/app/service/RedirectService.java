@@ -64,8 +64,4 @@ public class RedirectService {
         redirectRepository.delete(redirect);
     }
 
-
-
-
-
 }
