@@ -16,27 +16,27 @@ public class UserService {
     public User register(String username, String password) throws NotFoundUserException {
         username = username.trim();
         User user = userRepository.findById(username).orElse(null);
-        if (user == null){
+        if (user == null) {
             user = new User();
             user.setUsername(username);
             user.setPassword(password);
             saveUser(user);
             return user;
-        }else{
+        } else {
             throw new UserAlreadyExistException("Такой пользователь уже зарегистрирован");
         }
     }
 
     public User getUser(String username) throws NotFoundUserException {
         User user = userRepository.findById(username).orElse(null);
-        if (user != null){
+        if (user != null) {
             return user;
-        }else{
+        } else {
             throw new NotFoundUserException("Пользователь с таким именем не найден!");
         }
     }
 
-    public void saveUser(User user){
+    public void saveUser(User user) {
         userRepository.save(user);
     }
 

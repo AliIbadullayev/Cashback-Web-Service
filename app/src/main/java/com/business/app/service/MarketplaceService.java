@@ -16,15 +16,17 @@ public class MarketplaceService {
     MarketplaceRepository marketplaceRepository;
 
 
-    public Page<Marketplace> getMarkeplacePage(int pageNum, int pageSize){
+    public Page<Marketplace> getMarkeplacePage(int pageNum, int pageSize) {
 
-        if (pageNum < 1 || pageSize < 1) throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
+        if (pageNum < 1 || pageSize < 1)
+            throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
 
-        Pageable pageRequest = createPageRequest(pageNum-1, pageSize);
+        Pageable pageRequest = createPageRequest(pageNum - 1, pageSize);
 
         Page<Marketplace> resultPage = marketplaceRepository.findAll(pageRequest);
 
-        if (resultPage.getTotalPages() < pageNum) throw new ResourceNotFoundException("На указанной странице не найдено записей!");
+        if (resultPage.getTotalPages() < pageNum)
+            throw new ResourceNotFoundException("На указанной странице не найдено записей!");
 
         return resultPage;
     }
@@ -34,8 +36,8 @@ public class MarketplaceService {
         return marketplaceRepository.findById(marketplaceId).orElse(null);
     }
 
-    private Pageable createPageRequest(int pageNum, int pageSize){
-        return PageRequest.of(pageNum,pageSize);
+    private Pageable createPageRequest(int pageNum, int pageSize) {
+        return PageRequest.of(pageNum, pageSize);
     }
 
 

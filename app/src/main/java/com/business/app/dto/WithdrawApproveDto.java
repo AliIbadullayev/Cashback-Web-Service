@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class WithdrawApproveDto {
-    Long withdrawId;
     Boolean isApproved;
 }

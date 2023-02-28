@@ -22,8 +22,8 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<User> register(@RequestBody RegistrationRequestDto requestDto){
-        return new ResponseEntity<>(userService.register(requestDto.getUsername(),requestDto.getPassword()), HttpStatus.OK);
+    public ResponseEntity<User> register(@RequestBody RegistrationRequestDto requestDto) {
+        return new ResponseEntity<>(userService.register(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
     }
 
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Контроллер для запросов со стороны стороннего маркетплейса
- * */
+ */
 @RestController
 @RequestMapping(value = "/api/marketplaces")
 public class ThirdPartyMarketRestController {
@@ -41,8 +41,9 @@ public class ThirdPartyMarketRestController {
         return new ResponseEntity<>(purchaseService.purchaseAdd(purchaseFromMarketplaceDto), HttpStatus.OK);
     }
 
-    @PostMapping("approve-purchase")
-    public ResponseEntity<?> approvePurchase(@RequestBody PurchaseApproveDto purchaseApproveDto) {
-        return new ResponseEntity<>(purchaseService.approvePurchase(purchaseApproveDto), HttpStatus.OK);
+    @PostMapping("purchase/{purchase_id}/approve")
+    public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") Long purchaseId,
+                                             @RequestBody PurchaseApproveDto purchaseApproveDto) {
+        return new ResponseEntity<>(purchaseService.approvePurchase(purchaseId, purchaseApproveDto), HttpStatus.OK);
     }
 }

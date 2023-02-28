@@ -1,11 +1,7 @@
 package com.business.app.dto;
 
-import com.business.app.model.Marketplace;
 import com.business.app.model.Purchase;
 import com.business.app.model.Status;
-import com.business.app.model.User;
-import com.business.app.service.PurchaseService;
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -21,7 +17,7 @@ public class PurchaseDto {
     private double cashbackPercent;
     private double totalPrice;
 
-    public static PurchaseDto fromPurchase(Purchase purchase){
+    public static PurchaseDto fromPurchase(Purchase purchase) {
         PurchaseDto purchaseDto = new PurchaseDto();
         purchaseDto.setId(purchase.getId());
         purchaseDto.setTimestamp(purchase.getTimestamp());

@@ -14,9 +14,9 @@ public class PaymentMethodService {
 
     public PaymentMethod getPaymentMethod(Long id) throws NotFoundUserException {
         PaymentMethod paymentMethod = paymentMethodRepository.findById(id).orElse(null);
-        if (paymentMethod != null){
+        if (paymentMethod != null) {
             return paymentMethod;
-        }else{
+        } else {
             throw new NotFoundPaymentMethodException("Способ платежа с таким id не найден!");
         }
     }

@@ -32,7 +32,6 @@ public class UserRestController {
     WithdrawService withdrawService;
 
 
-
     @PostMapping("redirect")
     public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws NotFoundRedirectException {
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
@@ -40,7 +39,6 @@ public class UserRestController {
 
     @GetMapping(value = "{username}/available-balance")
     public ResponseEntity<?> getAvailableBalance(@PathVariable(name = "username") String username) throws NotFoundUserException {
-        System.out.println(username);
         User user = userService.getUser(username);
         return new ResponseEntity<>(user.getAvailableBalance(), HttpStatus.OK);
     }
@@ -58,7 +56,7 @@ public class UserRestController {
                                              @RequestParam("size") int size) throws NotFoundUserException {
         User user = userService.getUser(username);
 
-        return new ResponseEntity<>(purchaseService.getPurchasePage(user,page,size), HttpStatus.OK);
+        return new ResponseEntity<>(purchaseService.getPurchasePage(user, page, size), HttpStatus.OK);
     }
 
     @PostMapping("withdraw")

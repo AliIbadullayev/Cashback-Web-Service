@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
 @Entity
 @Table(name = "users")
 @Data
@@ -15,6 +16,8 @@ public class User {
 
     @JsonIgnore
     private String password;
+
+
     private double availableBalance;
     private double pendingBalance;
 }

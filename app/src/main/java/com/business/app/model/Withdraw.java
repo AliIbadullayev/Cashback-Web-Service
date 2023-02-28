@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.sql.Timestamp;
 
+
 @Entity
 @Table(name = "withdraw")
 @Data
@@ -18,11 +19,11 @@ public class Withdraw {
 
     private String credential;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
 

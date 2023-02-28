@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 
 @Entity
-@Table(name="redirects")
+@Table(name = "redirects")
 @Data
 public class Redirect {
 

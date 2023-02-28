@@ -22,7 +22,7 @@ public class WithdrawService {
     @Autowired
     PaymentMethodService paymentMethodService;
 
-    public Withdraw sendWithdraw (WithdrawDto withdrawDto) {
+    public Withdraw sendWithdraw(WithdrawDto withdrawDto) {
         User user = userService.getUser(withdrawDto.getUsername());
         PaymentMethod paymentMethod = paymentMethodService.getPaymentMethod(withdrawDto.getPaymentMethodId());
 
@@ -39,60 +39,62 @@ public class WithdrawService {
                     user.setAvailableBalance(user.getAvailableBalance() - withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100);
                     withdrawRepository.save(withdraw);
                     userService.saveUser(user);
-                }else {
+                } else {
                     throw new NotHandledWithdrawException("Insufficient amount to withdraw! Min amount to withdraw is: " + paymentMethod.getMinAmount());
                 }
-            }else{
+            } else {
                 throw new NotHandledWithdrawException("Payment credentials are wrong");
             }
-        }else {
+        } else {
             throw new NotHandledWithdrawException("The amount to withdraw is more than available to you!");
         }
         return withdraw;
     }
 
-    public Withdraw getWithdraw(Long id){
+    public Withdraw getWithdraw(Long id) {
         Withdraw withdraw = withdrawRepository.findById(id).orElse(null);
-        if (withdraw != null){
+        if (withdraw != null) {
             return withdraw;
-        }else {
+        } else {
             throw new NotHandledWithdrawException("Cannot found withdraw with such id!");
         }
     }
 
-    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto){
-        Withdraw withdraw = getWithdraw(withdrawApproveDto.getWithdrawId());
+    public Withdraw approveWithdraw(Long withdrawId, WithdrawApproveDto withdrawApproveDto) {
+        Withdraw withdraw = getWithdraw(withdrawId);
         User user = withdraw.getUser();
         double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
-        if (withdrawApproveDto.getIsApproved()){
+        if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
+            throw new NotHandledWithdrawException("Cannot handle with rejected or approved withdraw!");
+        if (withdrawApproveDto.getIsApproved()) {
             withdraw.setWithdrawStatus(Status.APPROVED);
-        }else {
+        } else {
             user.setAvailableBalance(user.getAvailableBalance() + withdrawAmount);
             withdraw.setWithdrawStatus(Status.REJECTED);
         }
         userService.saveUser(user);
+        withdraw.setUser(user);
         withdrawRepository.save(withdraw);
         return withdraw;
     }
 
-    private boolean checkPaymentMethod(String credential, PaymentMethodTypes type){
-        switch (type){
+    private boolean checkPaymentMethod(String credential, PaymentMethodTypes type) {
+        switch (type) {
             case TYPE_CARD -> {
                 return credential.length() == 16 && Long.parseLong(credential) < Math.pow(10, 17);
             }
             case TYPE_PHONE -> {
                 int counter = 0;
-                for(String c: credential.split("")){
+                for (String c : credential.split("")) {
                     if (c.matches("[0-9]"))
                         counter++;
                 }
                 return counter == 11;
             }
-            case TYPE_PERSONAL_ACCOUNT ->
-            {
+            case TYPE_PERSONAL_ACCOUNT -> {
                 return true;
             }
-            default ->{
+            default -> {
                 return false;
             }
         }

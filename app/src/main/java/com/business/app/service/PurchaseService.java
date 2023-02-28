@@ -10,7 +10,6 @@ import com.business.app.exception.ResourceNotFoundException;
 import com.business.app.model.*;
 import com.business.app.repository.PurchaseRepository;
 import com.business.app.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,29 +35,28 @@ public class PurchaseService {
         this.userRepository = userRepository;
     }
 
-    private boolean checkRules(Rules rules, PurchaseFromMarketplaceDto purchase){
-        System.out.println(rules.getMinPrice()+" "+ purchase.getTotalPrice());
+    private boolean checkRules(Rules rules, PurchaseFromMarketplaceDto purchase) {
         return rules.getMinPrice() <= purchase.getTotalPrice();
     }
 
-    private boolean checkTimeDeadline(long started ){
-        return (Timestamp.from(Instant.now()).getTime() - started)/1000 <= 30;
+    private boolean checkTimeDeadline(long started) {
+        return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 3000;
     }
 
     public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException {
         Purchase purchase = new Purchase();
         Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
-        if (checkTimeDeadline(redirect.getTime().getTime())){
+        if (checkTimeDeadline(redirect.getTime().getTime())) {
             purchase.setUser(redirect.getPk().getUser());
             purchase.setMarketplace(redirect.getPk().getMarketplace());
             purchase.setTimestamp(Timestamp.from(Instant.now()));
             purchase.setCashbackPercent(purchaseFromMarketplaceDto.getCashbackPercent());
             purchase.setTotalPrice(purchaseFromMarketplaceDto.getTotalPrice());
             User user = purchase.getUser();
-            if (checkRules(redirect.getPk().getMarketplace().getRules(), purchaseFromMarketplaceDto)){
+            if (checkRules(redirect.getPk().getMarketplace().getRules(), purchaseFromMarketplaceDto)) {
                 purchase.setCashbackPaymentStatus(Status.PENDING);
                 purchase.setRulesRespected(true);
-                user.setPendingBalance(user.getPendingBalance() + purchase.getCashbackPercent()*purchase.getTotalPrice()/100);
+                user.setPendingBalance(user.getPendingBalance() + purchase.getCashbackPercent() * purchase.getTotalPrice() / 100);
             } else {
                 purchase.setCashbackPaymentStatus(Status.REJECTED);
                 purchase.setRulesRespected(false);
@@ -72,9 +70,10 @@ public class PurchaseService {
         }
     }
 
-    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto) {
-        Purchase purchase = purchaseRepository.findById(purchaseApproveDto.getPurchaseId()).orElse(null);
+    public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) {
+        Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
         if (purchase != null) {
+
             if (purchase.getMarketplace().getId().equals(purchaseApproveDto.getMarketplaceId())) {
                 if (purchase.isRulesRespected() && purchase.getCashbackPaymentStatus() == Status.PENDING) {
                     User user = purchase.getUser();
@@ -100,15 +99,17 @@ public class PurchaseService {
     }
 
 
-    public List<PurchaseDto> getPurchasePage(User user, int pageNum, int pageSize){
+    public List<PurchaseDto> getPurchasePage(User user, int pageNum, int pageSize) {
 
-        if (pageNum < 1 || pageSize < 1) throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
+        if (pageNum < 1 || pageSize < 1)
+            throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
 
-        Pageable pageRequest = createPageRequest(pageNum-1, pageSize);
+        Pageable pageRequest = createPageRequest(pageNum - 1, pageSize);
 
-        Page<Purchase> resultPage = purchaseRepository.findAllByUser(user,pageRequest);
+        Page<Purchase> resultPage = purchaseRepository.findAllByUser(user, pageRequest);
 
-        if (resultPage.getTotalPages() < pageNum) throw new ResourceNotFoundException("На указанной странице не найдено записей!");
+        if (resultPage.getTotalPages() < pageNum)
+            throw new ResourceNotFoundException("На указанной странице не найдено записей!");
 
         List<PurchaseDto> resultList = new ArrayList<>();
 
@@ -121,8 +122,8 @@ public class PurchaseService {
     }
 
 
-    private Pageable createPageRequest(int pageNum, int pageSize){
-        return PageRequest.of(pageNum,pageSize, Sort.Direction.DESC, "timestamp");
+    private Pageable createPageRequest(int pageNum, int pageSize) {
+        return PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "timestamp");
     }
 
 
