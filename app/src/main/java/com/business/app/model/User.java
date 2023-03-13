@@ -4,6 +4,7 @@ package com.business.app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 
 @Entity
@@ -11,12 +12,17 @@ import lombok.Data;
 @Data
 public class User {
 
+
+
+
     @Id
+    @Column(name = "actor_username")
     private String username;
 
     @JsonIgnore
-    private String password;
-
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private Actor actor;
 
     private double availableBalance;
     private double pendingBalance;

@@ -6,4 +6,6 @@ import lombok.Data;
 public class PurchaseApproveDto {
     Boolean isApproved;
     Long marketplaceId;
+
+
 }

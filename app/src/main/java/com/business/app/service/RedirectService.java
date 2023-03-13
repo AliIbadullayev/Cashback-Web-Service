@@ -23,6 +23,9 @@ public class RedirectService {
     @Autowired
     MarketplaceService marketplaceService;
 
+
+
+
     public Redirect addRedirect(RedirectDto redirectDto) throws NotFoundRedirectException {
         Redirect redirect = new Redirect();
         User user = userService.getUser(redirectDto.getUserId());
@@ -41,13 +44,11 @@ public class RedirectService {
         }
     }
 
-    @Transactional
     public Redirect getRedirect(String username, Long marketplaceId) throws NotFoundRedirectException {
         User user = userService.getUser(username);
         Marketplace marketplace = marketplaceService.getMarketplace(marketplaceId);
 
         if (user != null && marketplace != null) {
-            Hibernate.initialize(marketplace.getRules());
             RedirectId redirectId = new RedirectId(user, marketplace);
             Redirect redirect = redirectRepository.findById(redirectId).orElse(null);
             if (redirect != null) {
