@@ -1,12 +1,12 @@
-package com.business.app.service;
+package com.example.transaction_service.service;
 
-import com.business.app.dto.PurchaseDto;
-import com.business.app.dto.PurchaseApproveDto;
-import com.business.app.dto.PurchaseFromMarketplaceDto;
-import com.business.app.exception.IllegalPageParametersException;
-import com.business.app.exception.NotFoundRedirectException;
-import com.business.app.exception.NotHandledPurchaseException;
-import com.business.app.exception.ResourceNotFoundException;
+import com.example.transaction_service.dto.PurchaseApproveDto;
+import com.example.transaction_service.dto.PurchaseDto;
+import com.example.transaction_service.dto.PurchaseFromMarketplaceDto;
+import com.example.transaction_service.exception.IllegalPageParametersException;
+import com.example.transaction_service.exception.NotFoundRedirectException;
+import com.example.transaction_service.exception.NotHandledPurchaseException;
+import com.example.transaction_service.exception.ResourceNotFoundException;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;

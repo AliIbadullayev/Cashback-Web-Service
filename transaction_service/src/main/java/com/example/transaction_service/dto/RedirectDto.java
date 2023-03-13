@@ -1,0 +1,10 @@
+package com.example.transaction_service.dto;
+
+import lombok.Data;
+
+@Data
+public class RedirectDto {
+    String userId;
+    Long marketplaceId;
+
+}

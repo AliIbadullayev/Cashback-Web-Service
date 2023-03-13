@@ -1,8 +1,11 @@
-package com.business.app.service;
+package com.example.transaction_service.service;
 
-import com.business.app.dto.RedirectDto;
-import com.business.app.exception.NotFoundRedirectException;
-import com.example.data.model.*;
+import com.example.transaction_service.dto.RedirectDto;
+import com.example.transaction_service.exception.NotFoundRedirectException;
+import com.example.data.model.Marketplace;
+import com.example.data.model.Redirect;
+import com.example.data.model.RedirectId;
+import com.example.data.model.User;
 import com.example.data.repository.RedirectRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +26,6 @@ public class RedirectService {
     @Autowired
     MarketplaceService marketplaceService;
 
-
-
-
     public Redirect addRedirect(RedirectDto redirectDto) throws NotFoundRedirectException {
         Redirect redirect = new Redirect();
         User user = userService.getUser(redirectDto.getUserId());
@@ -44,11 +44,13 @@ public class RedirectService {
         }
     }
 
+    @Transactional
     public Redirect getRedirect(String username, Long marketplaceId) throws NotFoundRedirectException {
         User user = userService.getUser(username);
         Marketplace marketplace = marketplaceService.getMarketplace(marketplaceId);
 
         if (user != null && marketplace != null) {
+            Hibernate.initialize(marketplace.getRules());
             RedirectId redirectId = new RedirectId(user, marketplace);
             Redirect redirect = redirectRepository.findById(redirectId).orElse(null);
             if (redirect != null) {

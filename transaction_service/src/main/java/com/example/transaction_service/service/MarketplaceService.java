@@ -1,7 +1,7 @@
-package com.business.app.service;
+package com.example.transaction_service.service;
 
-import com.business.app.exception.IllegalPageParametersException;
-import com.business.app.exception.ResourceNotFoundException;
+import com.example.transaction_service.exception.IllegalPageParametersException;
+import com.example.transaction_service.exception.ResourceNotFoundException;
 import com.example.data.model.Marketplace;
 import com.example.data.repository.MarketplaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;

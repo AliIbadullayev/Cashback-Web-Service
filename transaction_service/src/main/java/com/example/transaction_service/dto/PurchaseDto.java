@@ -1,4 +1,4 @@
-package com.business.app.dto;
+package com.example.transaction_service.dto;
 
 import com.example.data.model.Purchase;
 import com.example.data.model.Status;

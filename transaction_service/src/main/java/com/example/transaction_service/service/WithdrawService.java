@@ -1,14 +1,12 @@
-package com.business.app.service;
+package com.example.transaction_service.service;
 
-import com.business.app.dto.WithdrawApproveDto;
-import com.business.app.dto.WithdrawDto;
-import com.business.app.exception.NotHandledWithdrawException;
+import com.example.transaction_service.dto.WithdrawApproveDto;
+import com.example.transaction_service.dto.WithdrawDto;
+import com.example.transaction_service.exception.NotHandledWithdrawException;
 import com.example.data.model.*;
 import com.example.data.repository.WithdrawRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -63,38 +61,21 @@ public class WithdrawService {
     }
 
     public Withdraw approveWithdraw(Long withdrawId, WithdrawApproveDto withdrawApproveDto) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8081/api/transactions/acquire/withdraw/"+withdrawId+"/approve";
-
-        // create headers
-//        HttpHeaders headers = new HttpHeaders();
-//        // set `content-type` header
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        // set `accept` header
-//        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // create a post object
-
-        // build the request
-        HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto);
-        // send POST request
-        return restTemplate.postForObject(url, entity, Withdraw.class);
-
-//        Withdraw withdraw = getWithdraw(withdrawId);
-//        User user = withdraw.getUser();
-//        double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
-//        if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
-//            throw new NotHandledWithdrawException("Cannot handle with rejected or approved withdraw!");
-//        if (withdrawApproveDto.getIsApproved()) {
-//            withdraw.setWithdrawStatus(Status.APPROVED);
-//        } else {
-//            user.setAvailableBalance(user.getAvailableBalance() + withdrawAmount);
-//            withdraw.setWithdrawStatus(Status.REJECTED);
-//        }
-//        userService.saveUser(user);
-//        withdraw.setUser(user);
-//        withdrawRepository.save(withdraw);
-//        return withdraw;
+        Withdraw withdraw = getWithdraw(withdrawId);
+        User user = withdraw.getUser();
+        double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
+        if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
+            throw new NotHandledWithdrawException("Cannot handle with rejected or approved withdraw!");
+        if (withdrawApproveDto.getIsApproved()) {
+            withdraw.setWithdrawStatus(Status.APPROVED);
+        } else {
+            user.setAvailableBalance(user.getAvailableBalance() + withdrawAmount);
+            withdraw.setWithdrawStatus(Status.REJECTED);
+        }
+        userService.saveUser(user);
+        withdraw.setUser(user);
+        withdrawRepository.save(withdraw);
+        return withdraw;
     }
 
     private boolean checkPaymentMethod(String credential, PaymentMethodTypes type) {
