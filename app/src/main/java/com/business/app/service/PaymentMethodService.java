@@ -2,8 +2,8 @@ package com.business.app.service;
 
 import com.business.app.exception.NotFoundPaymentMethodException;
 import com.business.app.exception.NotFoundUserException;
-import com.business.app.model.PaymentMethod;
-import com.business.app.repository.PaymentMethodRepository;
+import com.example.data.model.PaymentMethod;
+import com.example.data.repository.PaymentMethodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

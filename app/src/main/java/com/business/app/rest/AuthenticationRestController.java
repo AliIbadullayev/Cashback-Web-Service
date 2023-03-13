@@ -2,7 +2,7 @@ package com.business.app.rest;
 
 
 import com.business.app.dto.RegistrationRequestDto;
-import com.business.app.model.User;
+import com.example.data.model.User;
 import com.business.app.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

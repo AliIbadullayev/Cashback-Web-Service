@@ -2,8 +2,8 @@ package com.business.app.service;
 
 import com.business.app.dto.RedirectDto;
 import com.business.app.exception.NotFoundRedirectException;
-import com.business.app.model.*;
-import com.business.app.repository.RedirectRepository;
+import com.example.data.model.*;
+import com.example.data.repository.RedirectRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

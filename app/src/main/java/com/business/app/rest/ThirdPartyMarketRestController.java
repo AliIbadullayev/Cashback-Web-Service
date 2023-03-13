@@ -6,6 +6,8 @@ import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
 import com.business.app.service.MarketplaceService;
 import com.business.app.service.PurchaseService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Контроллер для запросов со стороны стороннего маркетплейса
  */
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/marketplaces")
 public class ThirdPartyMarketRestController {
@@ -43,7 +46,7 @@ public class ThirdPartyMarketRestController {
 
     @PostMapping("purchase/{purchase_id}/approve")
     public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") Long purchaseId,
-                                             @RequestBody PurchaseApproveDto purchaseApproveDto) {
+                                             @RequestBody PurchaseApproveDto purchaseApproveDto){
         return new ResponseEntity<>(purchaseService.approvePurchase(purchaseId, purchaseApproveDto), HttpStatus.OK);
     }
 }

@@ -1,7 +1,7 @@
 package com.business.app.dto;
 
-import com.business.app.model.Purchase;
-import com.business.app.model.Status;
+import com.example.data.model.Purchase;
+import com.example.data.model.Status;
 import lombok.Data;
 
 import java.sql.Timestamp;

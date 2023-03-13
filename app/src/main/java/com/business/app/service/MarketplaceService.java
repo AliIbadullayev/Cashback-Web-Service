@@ -2,8 +2,8 @@ package com.business.app.service;
 
 import com.business.app.exception.IllegalPageParametersException;
 import com.business.app.exception.ResourceNotFoundException;
-import com.business.app.model.Marketplace;
-import com.business.app.repository.MarketplaceRepository;
+import com.example.data.model.Marketplace;
+import com.example.data.repository.MarketplaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
