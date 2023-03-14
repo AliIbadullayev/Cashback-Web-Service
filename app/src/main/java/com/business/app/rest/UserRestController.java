@@ -94,7 +94,7 @@ public class UserRestController {
                                           HttpServletRequest request) throws IllegalAccessException{
         if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), withdrawDto.getUsername())) throw new IllegalAccessException("У вас нет права на эту операцию");
         log.info("Withdraw method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto, request.getRequestURL().toString()), HttpStatus.OK);
+        return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
     }
 
 }

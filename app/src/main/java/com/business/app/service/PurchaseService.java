@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,15 +48,17 @@ public class PurchaseService {
         this.transactionServiceRequestHandler = transactionServiceRequestHandler;
     }
 
-    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto, String url) throws NotFoundRedirectException, NotHandledPurchaseException {
+    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto, String url, String token)  {
+        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
         String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto);
+        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto, httpHeaders);
         return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
-    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto, String url) {
+    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto, String url, String token)  {
+        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
         String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto);
+        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto, httpHeaders);
         return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 

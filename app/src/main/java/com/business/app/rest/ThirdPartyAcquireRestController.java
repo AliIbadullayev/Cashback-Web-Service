@@ -24,6 +24,6 @@ public class ThirdPartyAcquireRestController {
                                           @RequestBody WithdrawApproveDto withdrawApproveDto,
                                           HttpServletRequest request) {
         log.info("Withdraw approve method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(withdrawService.approveWithdraw(withdrawApproveDto, request.getRequestURL().toString()), HttpStatus.OK);
+        return new ResponseEntity<>(withdrawService.approveWithdraw(withdrawApproveDto, request.getRequestURL().toString(),  request.getHeader("Authorization")), HttpStatus.OK);
     }
 }

@@ -35,7 +35,7 @@ public class RedirectService {
     }
 
 
-    public Redirect addRedirect(RedirectDto redirectDto, String url, String token) throws NotFoundRedirectException {
+    public Redirect addRedirect(RedirectDto redirectDto, String url, String token)  {
         HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
         String newUrl = transactionServiceRequestHandler.generateUrl(url);
         HttpEntity<RedirectDto> entity = new HttpEntity<>(redirectDto, httpHeaders);

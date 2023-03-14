@@ -35,15 +35,10 @@ public class WithdrawService {
         this.restTemplate = new RestTemplate();
     }
 
-    public Withdraw sendWithdraw(WithdrawDto withdrawDto, String url) {
+    public Withdraw sendWithdraw(WithdrawDto withdrawDto, String url, String token)  {
+        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
         String newUrl = transactionServiceRequestHandler.generateUrl(url);
-//         create headers
-        HttpHeaders headers = new HttpHeaders();
-        // set `content-type` header
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        // set `accept` header
-//        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        HttpEntity<WithdrawDto> entity = new HttpEntity<>(withdrawDto);
+        HttpEntity<WithdrawDto> entity = new HttpEntity<>(withdrawDto, httpHeaders);
         return restTemplate.postForObject(newUrl, entity, Withdraw.class);
     }
 
@@ -56,9 +51,10 @@ public class WithdrawService {
         }
     }
 
-    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto, String url) {
+    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto, String url, String token)  {
+        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
         String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto);
+        HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto, httpHeaders);
         return restTemplate.postForObject(newUrl, entity, Withdraw.class);
     }
 }
