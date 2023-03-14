@@ -1,16 +1,18 @@
 package com.business.app.service;
 
+import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.RedirectDto;
 import com.business.app.exception.NotFoundRedirectException;
+import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.RedirectRepository;
+import jakarta.annotation.PostConstruct;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class RedirectService {
@@ -23,26 +25,23 @@ public class RedirectService {
     @Autowired
     MarketplaceService marketplaceService;
 
+    @Autowired
+    TransactionServiceRequestHandler transactionServiceRequestHandler;
 
+    private RestTemplate restTemplate;
 
-
-    public Redirect addRedirect(RedirectDto redirectDto) throws NotFoundRedirectException {
-        Redirect redirect = new Redirect();
-        User user = userService.getUser(redirectDto.getUserId());
-        Marketplace marketplace = marketplaceService.getMarketplace(redirectDto.getMarketplaceId());
-
-
-        if (user != null && marketplace != null) {
-            RedirectId redirectId = new RedirectId(user, marketplace);
-            redirect.setPk(redirectId);
-
-            redirect.setTime(Timestamp.valueOf(LocalDateTime.now()));
-            redirectRepository.save(redirect);
-            return redirect;
-        } else {
-            throw new NotFoundRedirectException("Not found user or marketplace");
-        }
+    @PostConstruct
+    public void init() {
+        this.restTemplate = new RestTemplate();
     }
+
+
+    public Redirect addRedirect(RedirectDto redirectDto, String url) throws NotFoundRedirectException {
+        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        HttpEntity<RedirectDto> entity = new HttpEntity<>(redirectDto);
+        return restTemplate.postForObject(newUrl, entity, Redirect.class);
+    }
+
 
     public Redirect getRedirect(String username, Long marketplaceId) throws NotFoundRedirectException {
         User user = userService.getUser(username);

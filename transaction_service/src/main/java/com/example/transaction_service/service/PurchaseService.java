@@ -1,25 +1,16 @@
 package com.example.transaction_service.service;
 
 import com.example.transaction_service.dto.PurchaseApproveDto;
-import com.example.transaction_service.dto.PurchaseDto;
 import com.example.transaction_service.dto.PurchaseFromMarketplaceDto;
-import com.example.transaction_service.exception.IllegalPageParametersException;
 import com.example.transaction_service.exception.NotFoundRedirectException;
 import com.example.transaction_service.exception.NotHandledPurchaseException;
-import com.example.transaction_service.exception.ResourceNotFoundException;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class PurchaseService {
@@ -97,34 +88,4 @@ public class PurchaseService {
         }
         return purchase;
     }
-
-
-    public List<PurchaseDto> getPurchasePage(User user, int pageNum, int pageSize) {
-
-        if (pageNum < 1 || pageSize < 1)
-            throw new IllegalPageParametersException("Номер страницы и её размер должны быть больше 1");
-
-        Pageable pageRequest = createPageRequest(pageNum - 1, pageSize);
-
-        Page<Purchase> resultPage = purchaseRepository.findAllByUser(user, pageRequest);
-
-        if (resultPage.getTotalPages() < pageNum)
-            throw new ResourceNotFoundException("На указанной странице не найдено записей!");
-
-        List<PurchaseDto> resultList = new ArrayList<>();
-
-        for (Purchase purchase : resultPage.getContent()) {
-            resultList.add(PurchaseDto.fromPurchase(purchase));
-        }
-
-        return resultList;
-
-    }
-
-
-    private Pageable createPageRequest(int pageNum, int pageSize) {
-        return PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "timestamp");
-    }
-
-
 }

@@ -40,13 +40,17 @@ public class ThirdPartyMarketRestController {
     }
 
     @PostMapping("purchase")
-    public ResponseEntity<?> addPurchase(@RequestBody PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException {
-        return new ResponseEntity<>(purchaseService.purchaseAdd(purchaseFromMarketplaceDto), HttpStatus.OK);
+    public ResponseEntity<?> addPurchase(@RequestBody PurchaseFromMarketplaceDto purchaseFromMarketplaceDto,
+                                         HttpServletRequest request)  throws NotFoundRedirectException, NotHandledPurchaseException {
+        log.info("Purchase method called with url: {}", request.getRequestURL());
+        return new ResponseEntity<>(purchaseService.purchaseAdd(purchaseFromMarketplaceDto, request.getRequestURL().toString()), HttpStatus.OK);
     }
 
     @PostMapping("purchase/{purchase_id}/approve")
     public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") Long purchaseId,
-                                             @RequestBody PurchaseApproveDto purchaseApproveDto){
-        return new ResponseEntity<>(purchaseService.approvePurchase(purchaseId, purchaseApproveDto), HttpStatus.OK);
+                                             @RequestBody PurchaseApproveDto purchaseApproveDto,
+                                             HttpServletRequest request) {
+        log.info("Purchase approve method called with url: {}", request.getRequestURL());
+        return new ResponseEntity<>(purchaseService.approvePurchase(purchaseApproveDto, request.getRequestURL().toString()), HttpStatus.OK);
     }
 }

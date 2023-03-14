@@ -3,18 +3,23 @@ package com.business.app.service;
 import com.business.app.dto.PurchaseDto;
 import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.PurchaseFromMarketplaceDto;
+import com.business.app.dto.WithdrawApproveDto;
 import com.business.app.exception.IllegalPageParametersException;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
 import com.business.app.exception.ResourceNotFoundException;
+import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -29,73 +34,32 @@ public class PurchaseService {
 
     private final UserRepository userRepository;
 
-    public PurchaseService(RedirectService redirectService, PurchaseRepository purchaseRepository, UserRepository userRepository) {
+    private final TransactionServiceRequestHandler transactionServiceRequestHandler;
+
+    private RestTemplate restTemplate;
+
+    @PostConstruct
+    public void init() {
+        this.restTemplate = new RestTemplate();
+    }
+
+    public PurchaseService(RedirectService redirectService, PurchaseRepository purchaseRepository, UserRepository userRepository, TransactionServiceRequestHandler transactionServiceRequestHandler) {
         this.redirectService = redirectService;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
+        this.transactionServiceRequestHandler = transactionServiceRequestHandler;
     }
 
-    private boolean checkRules(Rules rules, PurchaseFromMarketplaceDto purchase) {
-        return rules.getMinPrice() <= purchase.getTotalPrice();
+    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto, String url) throws NotFoundRedirectException, NotHandledPurchaseException {
+        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto);
+        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
-    private boolean checkTimeDeadline(long started) {
-        return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 3000;
-    }
-
-    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException {
-        Purchase purchase = new Purchase();
-        Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
-        if (checkTimeDeadline(redirect.getTime().getTime())) {
-            purchase.setUser(redirect.getPk().getUser());
-            purchase.setMarketplace(redirect.getPk().getMarketplace());
-            purchase.setTimestamp(Timestamp.from(Instant.now()));
-            purchase.setCashbackPercent(purchaseFromMarketplaceDto.getCashbackPercent());
-            purchase.setTotalPrice(purchaseFromMarketplaceDto.getTotalPrice());
-            User user = purchase.getUser();
-            if (checkRules(redirect.getPk().getMarketplace().getRules(), purchaseFromMarketplaceDto)) {
-                purchase.setCashbackPaymentStatus(Status.PENDING);
-                purchase.setRulesRespected(true);
-                user.setPendingBalance(user.getPendingBalance() + purchase.getCashbackPercent() * purchase.getTotalPrice() / 100);
-            } else {
-                purchase.setCashbackPaymentStatus(Status.REJECTED);
-                purchase.setRulesRespected(false);
-            }
-            userRepository.save(user);
-            purchaseRepository.save(purchase);
-            redirectService.removeRedirect(redirect);
-            return purchase;
-        } else {
-            throw new NotHandledPurchaseException("Not handled purchase because of time limit");
-        }
-    }
-
-    public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) {
-        Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
-        if (purchase != null) {
-
-            if (purchase.getMarketplace().getId().equals(purchaseApproveDto.getMarketplaceId())) {
-                if (purchase.isRulesRespected() && purchase.getCashbackPaymentStatus() == Status.PENDING) {
-                    User user = purchase.getUser();
-                    if (purchaseApproveDto.getIsApproved()) {
-                        user.setAvailableBalance(user.getAvailableBalance() + purchase.getTotalPrice() * purchase.getCashbackPercent() / 100);
-                        purchase.setCashbackPaymentStatus(Status.APPROVED);
-                    } else {
-                        purchase.setCashbackPaymentStatus(Status.REJECTED);
-                    }
-                    user.setPendingBalance(user.getPendingBalance() - purchase.getTotalPrice() * purchase.getCashbackPercent() / 100);
-                    userRepository.save(user);
-                    purchaseRepository.save(purchase);
-                } else {
-                    throw new NotHandledPurchaseException("Cannot handle with rejected or approved purchase!");
-                }
-            } else {
-                throw new NotHandledPurchaseException("Market that make request is not same as purchase market!");
-            }
-        } else {
-            throw new NotHandledPurchaseException("Cannot find purchase with this id");
-        }
-        return purchase;
+    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto, String url) {
+        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto);
+        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
  * Контроллер для запросов со стороны платежной системы (для вывода средств)
  */
 @RestController
-@RequestMapping(value = "/api/transactions/acquire")
+@RequestMapping(value = "/api/transaction/acquire")
 public class ThirdPartyAcquireRestController {
     @Autowired
     WithdrawService withdrawService;

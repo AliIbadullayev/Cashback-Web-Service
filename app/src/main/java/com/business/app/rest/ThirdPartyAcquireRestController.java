@@ -23,7 +23,7 @@ public class ThirdPartyAcquireRestController {
     public ResponseEntity<?> makeWithdraw(@PathVariable(name = "withdraw_id") Long withdrawId,
                                           @RequestBody WithdrawApproveDto withdrawApproveDto,
                                           HttpServletRequest request) {
-        log.info("Purchase approve method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(withdrawService.approveWithdraw(withdrawId, withdrawApproveDto), HttpStatus.OK);
+        log.info("Withdraw approve method called with url: {}", request.getRequestURL());
+        return new ResponseEntity<>(withdrawService.approveWithdraw(withdrawApproveDto, request.getRequestURL().toString()), HttpStatus.OK);
     }
 }
