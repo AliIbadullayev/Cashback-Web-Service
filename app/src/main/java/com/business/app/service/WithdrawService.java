@@ -9,6 +9,7 @@ import com.example.data.repository.WithdrawRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,10 +36,10 @@ public class WithdrawService {
     }
 
     public Withdraw sendWithdraw(WithdrawDto withdrawDto, String url) {
-        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
-        // create headers
-//        HttpHeaders headers = new HttpHeaders();
-//        // set `content-type` header
+        String newUrl = transactionServiceRequestHandler.generateUrl(url);
+//         create headers
+        HttpHeaders headers = new HttpHeaders();
+        // set `content-type` header
 //        headers.setContentType(MediaType.APPLICATION_JSON);
 //        // set `accept` header
 //        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -56,7 +57,7 @@ public class WithdrawService {
     }
 
     public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto, String url) {
-        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        String newUrl = transactionServiceRequestHandler.generateUrl(url);
         HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto);
         return restTemplate.postForObject(newUrl, entity, Withdraw.class);
     }

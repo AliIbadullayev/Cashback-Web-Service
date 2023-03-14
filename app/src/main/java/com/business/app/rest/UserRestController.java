@@ -52,7 +52,7 @@ public class UserRestController {
         if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), redirectDto.getUserId()))
             throw new IllegalAccessException("У вас нет права на эту операцию");
         log.info("Redirect method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(redirectService.addRedirect(redirectDto, request.getRequestURL().toString()), HttpStatus.OK);
+        return new ResponseEntity<>(redirectService.addRedirect(redirectDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
     }
 
     @GetMapping(value = "{username}/available-balance")

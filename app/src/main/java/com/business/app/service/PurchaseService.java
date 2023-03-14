@@ -3,7 +3,6 @@ package com.business.app.service;
 import com.business.app.dto.PurchaseDto;
 import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.PurchaseFromMarketplaceDto;
-import com.business.app.dto.WithdrawApproveDto;
 import com.business.app.exception.IllegalPageParametersException;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
@@ -21,8 +20,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,13 +48,13 @@ public class PurchaseService {
     }
 
     public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto, String url) throws NotFoundRedirectException, NotHandledPurchaseException {
-        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        String newUrl = transactionServiceRequestHandler.generateUrl(url);
         HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto);
         return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
     public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto, String url) {
-        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        String newUrl = transactionServiceRequestHandler.generateUrl(url);
         HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto);
         return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }

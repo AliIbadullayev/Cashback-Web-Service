@@ -1,18 +1,17 @@
 package com.business.app.service;
 
-import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.RedirectDto;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.RedirectRepository;
 import jakarta.annotation.PostConstruct;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
 
 @Service
 public class RedirectService {
@@ -36,9 +35,10 @@ public class RedirectService {
     }
 
 
-    public Redirect addRedirect(RedirectDto redirectDto, String url) throws NotFoundRedirectException {
-        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
-        HttpEntity<RedirectDto> entity = new HttpEntity<>(redirectDto);
+    public Redirect addRedirect(RedirectDto redirectDto, String url, String token) throws NotFoundRedirectException {
+        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
+        String newUrl = transactionServiceRequestHandler.generateUrl(url);
+        HttpEntity<RedirectDto> entity = new HttpEntity<>(redirectDto, httpHeaders);
         return restTemplate.postForObject(newUrl, entity, Redirect.class);
     }
 
