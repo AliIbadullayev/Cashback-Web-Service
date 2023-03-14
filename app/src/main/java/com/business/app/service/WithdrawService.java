@@ -3,15 +3,14 @@ package com.business.app.service;
 import com.business.app.dto.WithdrawApproveDto;
 import com.business.app.dto.WithdrawDto;
 import com.business.app.exception.NotHandledWithdrawException;
+import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.WithdrawRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.sql.Timestamp;
-import java.time.Instant;
 
 @Service
 public class WithdrawService {
@@ -24,33 +23,27 @@ public class WithdrawService {
     @Autowired
     PaymentMethodService paymentMethodService;
 
-    public Withdraw sendWithdraw(WithdrawDto withdrawDto) {
-        User user = userService.getUser(withdrawDto.getUsername());
-        PaymentMethod paymentMethod = paymentMethodService.getPaymentMethod(withdrawDto.getPaymentMethodId());
+    @Autowired
+    TransactionServiceRequestHandler transactionServiceRequestHandler;
 
-        Withdraw withdraw = new Withdraw();
-        if (withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100 <= user.getAvailableBalance()) {
-            if (checkPaymentMethod(withdrawDto.getCredential(), paymentMethod.getType())) {
-                if (withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100 >= paymentMethod.getMinAmount()) {
-                    withdraw.setWithdrawStatus(Status.PENDING);
-                    withdraw.setAmount(withdrawDto.getAmount());
-                    withdraw.setTime(Timestamp.from(Instant.now()));
-                    withdraw.setUser(user);
-                    withdraw.setCredential(withdrawDto.getCredential());
-                    withdraw.setPaymentMethod(paymentMethod);
-                    user.setAvailableBalance(user.getAvailableBalance() - withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100);
-                    withdrawRepository.save(withdraw);
-                    userService.saveUser(user);
-                } else {
-                    throw new NotHandledWithdrawException("Insufficient amount to withdraw! Min amount to withdraw is: " + paymentMethod.getMinAmount());
-                }
-            } else {
-                throw new NotHandledWithdrawException("Payment credentials are wrong");
-            }
-        } else {
-            throw new NotHandledWithdrawException("The amount to withdraw is more than available to you!");
-        }
-        return withdraw;
+    private RestTemplate restTemplate;
+
+
+    @PostConstruct
+    public void init() {
+        this.restTemplate = new RestTemplate();
+    }
+
+    public Withdraw sendWithdraw(WithdrawDto withdrawDto, String url) {
+        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
+        // create headers
+//        HttpHeaders headers = new HttpHeaders();
+//        // set `content-type` header
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        // set `accept` header
+//        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<WithdrawDto> entity = new HttpEntity<>(withdrawDto);
+        return restTemplate.postForObject(newUrl, entity, Withdraw.class);
     }
 
     public Withdraw getWithdraw(Long id) {
@@ -62,60 +55,9 @@ public class WithdrawService {
         }
     }
 
-    public Withdraw approveWithdraw(Long withdrawId, WithdrawApproveDto withdrawApproveDto) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8081/api/transactions/acquire/withdraw/"+withdrawId+"/approve";
-
-        // create headers
-//        HttpHeaders headers = new HttpHeaders();
-//        // set `content-type` header
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        // set `accept` header
-//        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // create a post object
-
-        // build the request
+    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto, String url) {
+        String newUrl = transactionServiceRequestHandler.generateUrlForTransactionService(url);
         HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto);
-        // send POST request
-        return restTemplate.postForObject(url, entity, Withdraw.class);
-
-//        Withdraw withdraw = getWithdraw(withdrawId);
-//        User user = withdraw.getUser();
-//        double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
-//        if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
-//            throw new NotHandledWithdrawException("Cannot handle with rejected or approved withdraw!");
-//        if (withdrawApproveDto.getIsApproved()) {
-//            withdraw.setWithdrawStatus(Status.APPROVED);
-//        } else {
-//            user.setAvailableBalance(user.getAvailableBalance() + withdrawAmount);
-//            withdraw.setWithdrawStatus(Status.REJECTED);
-//        }
-//        userService.saveUser(user);
-//        withdraw.setUser(user);
-//        withdrawRepository.save(withdraw);
-//        return withdraw;
-    }
-
-    private boolean checkPaymentMethod(String credential, PaymentMethodTypes type) {
-        switch (type) {
-            case TYPE_CARD -> {
-                return credential.length() == 16 && Long.parseLong(credential) < Math.pow(10, 17);
-            }
-            case TYPE_PHONE -> {
-                int counter = 0;
-                for (String c : credential.split("")) {
-                    if (c.matches("[0-9]"))
-                        counter++;
-                }
-                return counter == 11;
-            }
-            case TYPE_PERSONAL_ACCOUNT -> {
-                return true;
-            }
-            default -> {
-                return false;
-            }
-        }
+        return restTemplate.postForObject(newUrl, entity, Withdraw.class);
     }
 }

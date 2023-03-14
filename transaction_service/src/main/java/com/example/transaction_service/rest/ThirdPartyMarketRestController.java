@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * Контроллер для запросов со стороны стороннего маркетплейса
  */
 @RestController
-@RequestMapping(value = "/api/marketplaces")
+@RequestMapping(value = "/api/transaction/marketplaces")
 public class ThirdPartyMarketRestController {
 
     @Autowired
@@ -27,13 +27,6 @@ public class ThirdPartyMarketRestController {
     public ThirdPartyMarketRestController(PurchaseService purchaseService, MarketplaceService marketplaceService) {
         this.purchaseService = purchaseService;
         this.marketplaceService = marketplaceService;
-    }
-
-
-    @GetMapping()
-    public ResponseEntity<?> getPaginatedMarketplaces(@RequestParam("page") int page,
-                                                      @RequestParam("size") int size) {
-        return new ResponseEntity<>(marketplaceService.getMarkeplacePage(page, size).getContent(), HttpStatus.OK);
     }
 
     @PostMapping("purchase")

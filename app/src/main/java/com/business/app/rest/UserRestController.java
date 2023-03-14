@@ -2,9 +2,10 @@ package com.business.app.rest;
 
 import com.business.app.dto.RedirectDto;
 import com.business.app.dto.WithdrawDto;
-import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotFoundUserException;
 import com.business.app.service.*;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import com.example.data.model.User;
 /**
  * Контроллер для запросов со стороны пользователя
  */
-
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/users/")
 public class UserRestController {
@@ -33,8 +34,10 @@ public class UserRestController {
 
 
     @PostMapping("redirect")
-    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws NotFoundRedirectException {
-        return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
+    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto,
+                                         HttpServletRequest request) {
+        log.info("Redirect method called with url: {}", request.getRequestURL());
+        return new ResponseEntity<>(redirectService.addRedirect(redirectDto, request.getRequestURL().toString()), HttpStatus.OK);
     }
 
     @GetMapping(value = "{username}/available-balance")
@@ -60,8 +63,10 @@ public class UserRestController {
     }
 
     @PostMapping("withdraw")
-    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto) {
-        return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto), HttpStatus.OK);
+    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto,
+                                          HttpServletRequest request) {
+        log.info("Withdraw method called with url: {}", request.getRequestURL());
+        return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto, request.getRequestURL().toString()), HttpStatus.OK);
     }
 
 }

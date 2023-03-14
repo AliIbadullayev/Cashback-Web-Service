@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping(value = "/api/users/")
+@RequestMapping(value = "/api/transaction/users/")
 public class UserRestController {
 
     @Autowired
@@ -35,28 +35,6 @@ public class UserRestController {
     @PostMapping("redirect")
     public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws NotFoundRedirectException {
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "{username}/available-balance")
-    public ResponseEntity<?> getAvailableBalance(@PathVariable(name = "username") String username) throws NotFoundUserException {
-        User user = userService.getUser(username);
-        return new ResponseEntity<>(user.getAvailableBalance(), HttpStatus.OK);
-    }
-
-
-    @GetMapping(value = "{username}/pending-balance")
-    public ResponseEntity<?> getPendingBalance(@PathVariable(name = "username") String username) throws NotFoundUserException {
-        User user = userService.getUser(username);
-        return new ResponseEntity<>(user.getPendingBalance(), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "{username}/purchases")
-    public ResponseEntity<?> getAllPurchases(@PathVariable(name = "username") String username,
-                                             @RequestParam("page") int page,
-                                             @RequestParam("size") int size) throws NotFoundUserException {
-        User user = userService.getUser(username);
-
-        return new ResponseEntity<>(purchaseService.getPurchasePage(user, page, size), HttpStatus.OK);
     }
 
     @PostMapping("withdraw")
