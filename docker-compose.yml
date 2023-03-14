@@ -1,0 +1,45 @@
+services:
+  app:
+    image: app-image 
+    build: ./app/
+    container_name: app
+    depends_on:
+      - db
+      - transaction  
+    ports:
+      - 8779:8779
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=2281337
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - transaction.service.host
+      - TRANSACTION_SERVICE_HOST=transaction
+
+  transaction:
+    image: transaction-image
+    build: ./transaction_service/
+    container_name: transaction
+    depends_on:
+      - db 
+    ports:
+      - 8081:8081
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=2281337
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  db:
+    image: postgres:15
+    container_name: db
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2281337
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

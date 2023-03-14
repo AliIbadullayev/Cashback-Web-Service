@@ -15,11 +15,15 @@ public class TransactionServiceRequestHandler {
     @Value("${transaction.service.secret}")
     private String TRANSACTION_SECRET;
 
+    @Value("${transaction.service.host}")
+    private String TRANSACTION_HOST;
+
     @Value("${server.port}")
     private Long SERVER_PORT;
     public String generateUrl(String url){
         String newUrl = url.replaceFirst("api/", "api/transaction/");
         newUrl = newUrl.replaceFirst(":"+SERVER_PORT, ":"+TRANSACTION_PORT);
+        newUrl = newUrl.replaceFirst("localhost", TRANSACTION_HOST);
         log.info("Request will be sent to transaction service on URL: {}", newUrl);
         return newUrl;
     }
