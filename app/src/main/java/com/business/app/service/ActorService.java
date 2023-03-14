@@ -7,9 +7,10 @@ import com.business.app.exception.NotFoundUserException;
 import com.business.app.model.Actor;
 import com.business.app.model.Role;
 import com.business.app.model.User;
+import com.business.app.model.XmlActor;
 import com.business.app.repository.ActorRepository;
 import com.business.app.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.business.app.repository.XmlActorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,17 @@ public class ActorService {
 
 
     private final ActorRepository actorRepository;
+
+    private final XmlActorRepository xmlActorRepository;
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
 
-    public ActorService(ActorRepository actorRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public ActorService(ActorRepository actorRepository, XmlActorRepository xmlActorRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.actorRepository = actorRepository;
+        this.xmlActorRepository = xmlActorRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -52,6 +57,27 @@ public class ActorService {
         }
     }
 
+    public XmlActor registerXmlActor(String username, String password){
+        username = username.trim();
+        XmlActor xmlActor = xmlActorRepository.findByUsername(username);
+        if (xmlActor == null) {
+            xmlActor = new XmlActor();
+
+            xmlActor.setUsername(username);
+            xmlActor.setPassword(passwordEncoder.encode(password.trim()));
+            xmlActor.setRole(Role.USER);
+
+
+
+            saveXmlActor(xmlActor);
+
+
+            return xmlActor;
+        } else {
+            throw new ActorAlreadyExistException("Такая учетная запись уже зарегистрирована");
+        }
+    }
+
 
     public Actor getActor(String username) throws NotFoundUserException {
         Actor actor = actorRepository.findById(username).orElse(null);
@@ -62,9 +88,23 @@ public class ActorService {
         }
     }
 
+    public XmlActor getXmlActor(String username) throws Exception {
+        XmlActor actor = xmlActorRepository.findByUsername(username);
+        if (actor != null) {
+            return actor;
+        } else {
+            throw new NotFoundActorException("Учетная запись с таким именем не найдена!");
+        }
+    }
+
 
     public void saveActor(Actor actor) {
         actorRepository.save(actor);
+    }
+
+    public void saveXmlActor(XmlActor xmlActor) {
+        System.out.println("вызов метода save");
+        xmlActorRepository.save(xmlActor);
     }
 
     public void saveUser(User user) {

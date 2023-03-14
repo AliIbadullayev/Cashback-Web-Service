@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actors>
+    <actor>
+        <username>bank</username>
+        <password>$2a$12$gsRpOqMAlCH9Fqb1ca/Z6eJJi88oMsHmzUlRiteNVWJDqwaH/CpIq</password>
+        <role>ACQUIRE</role>
+    </actor>
+    <actor>
+        <username>market</username>
+        <password>$2a$12$AODiVpGfuaCNGasKaM3Rg.4.wtUtYUK4EjO6zw8eksaq3AV0dHoYq</password>
+        <role>MARKET</role>
+    </actor>
+    <actor>
+        <username>lwbeamer</username>
+        <password>$2a$10$wdCfkfx89k82Sy7udRStQOi16dgn8q/TuNm0/hxnhF61u7.9TdDNi</password>
+        <role>USER</role>
+    </actor>
+    <actor>
+        <username>ali</username>
+        <password>$2a$10$zhnDbQ.Tb/IEgeoFbuWrIes8J1n2RUBO8Z0KsCiRiCy0zIMaWaO22</password>
+        <role>USER</role>
+    </actor>
+</actors>

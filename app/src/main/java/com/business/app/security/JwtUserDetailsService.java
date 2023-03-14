@@ -1,6 +1,7 @@
 package com.business.app.security;
 
 import com.business.app.model.Actor;
+import com.business.app.model.XmlActor;
 import com.business.app.service.ActorService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final ActorService actorService;
 
+
     public JwtUserDetailsService(ActorService actorService) {
         this.actorService = actorService;
     }
@@ -19,6 +21,12 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Actor actor = actorService.getActor(username);
+//        try {
+//            XmlActor xmlActor = actorService.getXmlActor(username);
+//            return JwtActor.fromXmlActor(xmlActor);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
         return JwtActor.fromActor(actor);
     }
 }
