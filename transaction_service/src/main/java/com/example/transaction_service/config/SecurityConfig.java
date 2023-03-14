@@ -3,6 +3,7 @@ package com.example.transaction_service.config;
 
 import com.example.transaction_service.security.JwtTokenFilter;
 import com.example.data.model.Role;
+import com.example.transaction_service.security.MostSecretFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,7 @@ public class SecurityConfig {
 //    private final JwtConfigurer jwtConfigurer;
 
     private final JwtTokenFilter jwtTokenFilter;
+    private final MostSecretFilter mostSecretFilter;
 
     private static final String MARKET_ENDPOINT = "/api/transaction/marketplaces/**";
     private static final String ACQUIRE_ENDPOINT = "/api/transaction/acquire/**";
@@ -28,8 +30,9 @@ public class SecurityConfig {
     private static final String USER_ENDPOINT = "/api/transaction/users/**";
 
 
-    public SecurityConfig(JwtTokenFilter jwtTokenFilter) {
+    public SecurityConfig(JwtTokenFilter jwtTokenFilter, MostSecretFilter mostSecretFilter) {
         this.jwtTokenFilter = jwtTokenFilter;
+        this.mostSecretFilter = mostSecretFilter;
     }
 
     @Bean
@@ -38,6 +41,7 @@ public class SecurityConfig {
                 .httpBasic()
                 .disable()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(mostSecretFilter, JwtTokenFilter.class)
                 .csrf().disable()
                 .cors().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -6,6 +6,7 @@ import com.example.transaction_service.exception.NotFoundRedirectException;
 import com.example.transaction_service.exception.NotFoundUserException;
 import com.example.transaction_service.service.*;
 import com.example.data.model.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/transaction/users/")
+
 public class UserRestController {
 
     @Autowired
@@ -31,9 +33,11 @@ public class UserRestController {
     @Autowired
     WithdrawService withdrawService;
 
-
     @PostMapping("redirect")
-    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto) throws NotFoundRedirectException {
+    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto, HttpServletRequest httpServletRequest) throws NotFoundRedirectException {
+        System.out.println(httpServletRequest.getRemoteHost());
+        System.out.println(httpServletRequest.getRemotePort());
+        System.out.println(httpServletRequest.getRemoteUser());
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
     }
 

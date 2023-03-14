@@ -12,6 +12,9 @@ public class TransactionServiceRequestHandler {
     @Value("${transaction.service.port}")
     private Long TRANSACTION_PORT;
 
+    @Value("${transaction.service.secret}")
+    private String TRANSACTION_SECRET;
+
     @Value("${server.port}")
     private Long SERVER_PORT;
     public String generateUrl(String url){
@@ -24,6 +27,7 @@ public class TransactionServiceRequestHandler {
     public HttpHeaders generateHttpHeader(String token){
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token.substring(7));
+        headers.set("MostSecretKey", TRANSACTION_SECRET);
         return headers;
     }
 }
