@@ -1,22 +1,20 @@
-package com.business.app.model;
+package com.example.data.model;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlEnum;
-import jakarta.xml.bind.annotation.XmlEnumValue;
+//import jakarta.xml.bind.annotation.XmlEnum;
+//import jakarta.xml.bind.annotation.XmlEnumValue;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlEnum
+//@XmlEnum
 public enum Role {
-    @XmlEnumValue("USER")
+//    @XmlEnumValue("USER")
     USER,
-    @XmlEnumValue("MARKET")
+//    @XmlEnumValue("MARKET")
     MARKET,
-    @XmlEnumValue("ACQUIRE")
+//    @XmlEnumValue("ACQUIRE")
     ACQUIRE;
 
     public List<GrantedAuthority> getAuthorities() {

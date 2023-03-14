@@ -1,7 +1,7 @@
 package com.business.app.security;
 
-import com.business.app.model.Actor;
-import com.business.app.model.XmlActor;
+import com.example.data.model.Actor;
+//import com.example.data.model.XmlActor;
 import com.business.app.service.ActorService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

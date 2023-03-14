@@ -3,9 +3,9 @@ package com.business.app.rest;
 
 import com.business.app.dto.AuthenticationRequestDto;
 import com.business.app.dto.RegistrationRequestDto;
-import com.business.app.model.Actor;
-import com.business.app.model.User;
-import com.business.app.model.XmlActor;
+import com.example.data.model.Actor;
+import com.example.data.model.User;
+//import com.example.data.model.XmlActor;
 import com.business.app.security.JwtTokenProvider;
 import com.business.app.service.ActorService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,10 +67,10 @@ public class AuthenticationRestController {
         return new ResponseEntity<>(actorService.register(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
     }
 
-    @PostMapping("register-xml")
-    public ResponseEntity<XmlActor> registerXml(@RequestBody RegistrationRequestDto requestDto) {
-        return new ResponseEntity<>(actorService.registerXmlActor(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
-    }
+//    @PostMapping("register-xml")
+//    public ResponseEntity<XmlActor> registerXml(@RequestBody RegistrationRequestDto requestDto) {
+//        return new ResponseEntity<>(actorService.registerXmlActor(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
+//    }
 
 
 }
