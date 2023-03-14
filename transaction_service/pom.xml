@@ -47,7 +47,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.business</groupId>
+			<groupId>com.example</groupId>
 			<artifactId>data</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
