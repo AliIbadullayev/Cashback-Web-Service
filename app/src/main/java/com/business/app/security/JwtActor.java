@@ -2,6 +2,7 @@ package com.business.app.security;
 
 import com.example.data.model.Actor;
 //import com.example.data.model.XmlActor;
+import com.example.data.model.XmlActor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,9 +28,9 @@ public class JwtActor implements UserDetails {
         return new JwtActor(actor.getUsername(), actor.getPassword(), actor.getRole().getAuthorities());
     }
 
-//    public static UserDetails fromXmlActor(XmlActor xmlActor) {
-//        return new JwtActor(xmlActor.getUsername(), xmlActor.getPassword(), xmlActor.getRole().getAuthorities());
-//    }
+    public static UserDetails fromXmlActor(XmlActor xmlActor) {
+        return new JwtActor(xmlActor.getUsername(), xmlActor.getPassword(), xmlActor.getRole().getAuthorities());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

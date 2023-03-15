@@ -8,6 +8,7 @@ import com.example.data.model.User;
 //import com.example.data.model.XmlActor;
 import com.business.app.security.JwtTokenProvider;
 import com.business.app.service.ActorService;
+import com.example.data.model.XmlActor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -64,13 +65,15 @@ public class AuthenticationRestController {
 
     @PostMapping("register")
     public ResponseEntity<User> register(@RequestBody RegistrationRequestDto requestDto) {
-        return new ResponseEntity<>(actorService.register(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
+        User user = actorService.register(requestDto.getUsername(), requestDto.getPassword());
+        actorService.registerXmlActor(requestDto.getUsername(), requestDto.getPassword());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-//    @PostMapping("register-xml")
-//    public ResponseEntity<XmlActor> registerXml(@RequestBody RegistrationRequestDto requestDto) {
-//        return new ResponseEntity<>(actorService.registerXmlActor(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
-//    }
+    @PostMapping("register-xml")
+    public ResponseEntity<XmlActor> registerXml(@RequestBody RegistrationRequestDto requestDto) {
+        return new ResponseEntity<>(actorService.registerXmlActor(requestDto.getUsername(), requestDto.getPassword()), HttpStatus.OK);
+    }
 
 
 }

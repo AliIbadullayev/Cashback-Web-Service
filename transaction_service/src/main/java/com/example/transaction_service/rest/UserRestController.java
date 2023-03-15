@@ -35,9 +35,6 @@ public class UserRestController {
 
     @PostMapping("redirect")
     public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto, HttpServletRequest httpServletRequest) throws NotFoundRedirectException {
-        System.out.println(httpServletRequest.getRemoteHost());
-        System.out.println(httpServletRequest.getRemotePort());
-        System.out.println(httpServletRequest.getRemoteUser());
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
     }
 

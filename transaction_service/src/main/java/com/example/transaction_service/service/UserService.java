@@ -13,19 +13,6 @@ public class UserService {
     UserRepository userRepository;
 
 
-//    public User register(String username, String password) throws NotFoundUserException {
-//        username = username.trim();
-//        User user = userRepository.findById(username).orElse(null);
-//        if (user == null) {
-//            user = new User();
-//            user.setUsername(username);
-//            user.setPassword(password);
-//            saveUser(user);
-//            return user;
-//        } else {
-//            throw new UserAlreadyExistException("Такой пользователь уже зарегистрирован");
-//        }
-//    }
 
     public User getUser(String username) throws NotFoundUserException {
         User user = userRepository.findById(username).orElse(null);
