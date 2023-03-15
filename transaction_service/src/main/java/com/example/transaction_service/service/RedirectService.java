@@ -39,9 +39,9 @@ public class RedirectService {
 
     public Redirect addRedirect(RedirectDto redirectDto) throws NotFoundRedirectException, SystemException, NotSupportedException {
         transactionManager.begin();
-        Transaction transaction = transactionManager.getCurrentTransaction();
+//        Transaction transaction = transactionManager.getCurrentTransaction();
 
-        System.out.println("Current trans "+ transaction);
+//        System.out.println("Current trans "+ transaction);
 
         try{
             Redirect redirect = new Redirect();
@@ -69,7 +69,6 @@ public class RedirectService {
 
     }
 
-    @Transactional
     public Redirect getRedirect(String username, Long marketplaceId) throws NotFoundRedirectException {
         User user = userService.getUser(username);
         Marketplace marketplace = marketplaceService.getMarketplace(marketplaceId);

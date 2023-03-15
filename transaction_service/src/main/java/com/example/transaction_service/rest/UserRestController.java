@@ -42,7 +42,7 @@ public class UserRestController {
     }
 
     @PostMapping("withdraw")
-    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto) {
+    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto) throws SystemException, NotSupportedException {
         return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto), HttpStatus.OK);
     }
 
