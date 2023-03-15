@@ -6,11 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 
 @RestControllerAdvice
 public class AppExceptionHandler {
     @ExceptionHandler({NotFoundRedirectException.class, NotFoundUserException.class,
-            NotFoundPaymentMethodException.class, ResourceNotFoundException.class})
+            NotFoundPaymentMethodException.class, ResourceNotFoundException.class, SystemException.class, NotSupportedException.class})
     public ResponseEntity<?> handleNotFoundException(RuntimeException runtimeException) {
         return new ResponseEntity<Object>(
                 runtimeException.getMessage(), HttpStatus.NOT_FOUND);

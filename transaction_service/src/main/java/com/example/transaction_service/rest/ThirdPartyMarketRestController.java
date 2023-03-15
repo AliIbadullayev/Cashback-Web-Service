@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 
 /**
  * Контроллер для запросов со стороны стороннего маркетплейса
@@ -30,13 +33,13 @@ public class ThirdPartyMarketRestController {
     }
 
     @PostMapping("purchase")
-    public ResponseEntity<?> addPurchase(@RequestBody PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException {
+    public ResponseEntity<?> addPurchase(@RequestBody PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException, NotSupportedException {
         return new ResponseEntity<>(purchaseService.purchaseAdd(purchaseFromMarketplaceDto), HttpStatus.OK);
     }
 
     @PostMapping("purchase/{purchase_id}/approve")
     public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") Long purchaseId,
-                                             @RequestBody PurchaseApproveDto purchaseApproveDto) {
+                                             @RequestBody PurchaseApproveDto purchaseApproveDto) throws SystemException, NotSupportedException {
         return new ResponseEntity<>(purchaseService.approvePurchase(purchaseId, purchaseApproveDto), HttpStatus.OK);
     }
 }
