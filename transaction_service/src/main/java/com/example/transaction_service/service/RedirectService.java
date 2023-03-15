@@ -58,14 +58,13 @@ public class RedirectService {
                 transactionManager.commit();
                 return redirect;
             } else {
-                System.out.println("Зашли в else");
                 throw new NotFoundRedirectException("Not found user or marketplace");
             }
 
 
         } catch (Exception e){
             transactionManager.rollback();
-            throw new TransactionException("Ошибка выполнения транзакции");
+            throw new TransactionException("Ошибка выполнения транзакции: "+e.getMessage());
         }
 
     }

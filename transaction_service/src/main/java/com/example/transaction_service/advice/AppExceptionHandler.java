@@ -17,9 +17,11 @@ public class AppExceptionHandler {
     }
 
     @ExceptionHandler({UserAlreadyExistException.class, IllegalPageParametersException.class, NotHandledWithdrawException.class,
-            NotHandledPurchaseException.class})
+            NotHandledPurchaseException.class, TransactionException.class})
     public ResponseEntity<?> handleBadRequestException(RuntimeException runtimeException) {
         return new ResponseEntity<Object>(
                 runtimeException.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+
 }
