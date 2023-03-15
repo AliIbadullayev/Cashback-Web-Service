@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 /**
  * Контроллер для запросов со стороны пользователя
  */
@@ -34,7 +37,7 @@ public class UserRestController {
     WithdrawService withdrawService;
 
     @PostMapping("redirect")
-    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto, HttpServletRequest httpServletRequest) throws NotFoundRedirectException {
+    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto, HttpServletRequest httpServletRequest) throws NotFoundRedirectException, SystemException, NotSupportedException {
         return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
     }
 
