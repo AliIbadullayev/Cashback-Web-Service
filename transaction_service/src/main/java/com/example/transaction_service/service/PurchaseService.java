@@ -44,12 +44,8 @@ public class PurchaseService {
     }
 
     public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException, NotSupportedException {
-        transactionManager.begin();
-        Transaction transaction = transactionManager.getCurrentTransaction();
-
-        System.out.println("Current trans "+ transaction);
-
-        try{
+        try {
+            transactionManager.begin();
             Purchase purchase = new Purchase();
             Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
             if (checkTimeDeadline(redirect.getTime().getTime())) {
@@ -74,19 +70,16 @@ public class PurchaseService {
             } else {
                 throw new NotHandledPurchaseException("Not handled purchase because of time limit");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             transactionManager.rollback();
-            throw new TransactionException("Ошибка выполнения транзакции: "+e.getMessage());
+            throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
+
     }
 
     public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) throws SystemException, NotSupportedException {
-        transactionManager.begin();
-        Transaction transaction = transactionManager.getCurrentTransaction();
-
-        System.out.println("Current trans "+ transaction);
-
         try {
+            transactionManager.begin();
             Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
             if (purchase != null) {
 
@@ -112,10 +105,9 @@ public class PurchaseService {
                 throw new NotHandledPurchaseException("Cannot find purchase with this id");
             }
             return purchase;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             transactionManager.rollback();
-            throw new TransactionException("Ошибка выполнения транзакции: "+e.getMessage());
+            throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }
 }

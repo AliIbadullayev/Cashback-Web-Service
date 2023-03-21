@@ -32,9 +32,8 @@ public class WithdrawService {
     }
 
     public Withdraw sendWithdraw(WithdrawDto withdrawDto) throws SystemException, NotSupportedException {
-        transactionManager.begin();
-
         try {
+            transactionManager.begin();
 
             User user = userService.getUser(withdrawDto.getUsername());
             PaymentMethod paymentMethod = paymentMethodService.getPaymentMethod(withdrawDto.getPaymentMethodId());

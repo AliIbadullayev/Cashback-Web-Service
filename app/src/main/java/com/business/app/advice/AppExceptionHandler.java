@@ -9,12 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpClientErrorException;
+
 
 @Slf4j
 @RestControllerAdvice
 public class AppExceptionHandler {
-    @ExceptionHandler({NotFoundRedirectException.class, NotFoundUserException.class,
+    @ExceptionHandler({NotFoundActorException.class, NotFoundRedirectException.class, NotFoundUserException.class,
             NotFoundPaymentMethodException.class, ResourceNotFoundException.class})
     public ResponseEntity<?> handleNotFoundException(RuntimeException runtimeException) {
         log.error("Occurred NotFoundException with message: {}({})", runtimeException.getMessage(), HttpStatus.NOT_FOUND);
@@ -32,8 +32,9 @@ public class AppExceptionHandler {
 
     @ExceptionHandler({AuthenticationException.class, JwtAuthenticationException.class, IllegalAccessException.class})
     public ResponseEntity<?> handleAuthException(RuntimeException runtimeException){
+        log.error("Occurred AuthException with message: {}({})", runtimeException.getMessage(),  HttpStatus.FORBIDDEN);
         return new ResponseEntity<Object>(
-                runtimeException.getMessage(), HttpStatus.FORBIDDEN);
+                "runtimeException.getMessage()", HttpStatus.GONE);
     }
 
     @ExceptionHandler({HttpClientErrorException.class})

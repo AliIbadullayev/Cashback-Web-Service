@@ -38,12 +38,8 @@ public class RedirectService {
     }
 
     public Redirect addRedirect(RedirectDto redirectDto) throws NotFoundRedirectException, SystemException, NotSupportedException {
-        transactionManager.begin();
-//        Transaction transaction = transactionManager.getCurrentTransaction();
-
-//        System.out.println("Current trans "+ transaction);
-
         try{
+            transactionManager.begin();
             Redirect redirect = new Redirect();
             User user = userService.getUser(redirectDto.getUserId());
             Marketplace marketplace = marketplaceService.getMarketplace(redirectDto.getMarketplaceId());
@@ -60,13 +56,10 @@ public class RedirectService {
             } else {
                 throw new NotFoundRedirectException("Not found user or marketplace");
             }
-
-
         } catch (Exception e){
             transactionManager.rollback();
             throw new TransactionException("Ошибка выполнения транзакции: "+e.getMessage());
         }
-
     }
 
     public Redirect getRedirect(String username, Long marketplaceId) throws NotFoundRedirectException {

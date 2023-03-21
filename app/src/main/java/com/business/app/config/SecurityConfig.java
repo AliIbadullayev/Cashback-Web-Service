@@ -1,16 +1,19 @@
 package com.business.app.config;
 
 
+import com.business.app.security.JwtUserDetailsService;
 import com.example.data.model.Role;
 import com.business.app.security.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -18,9 +21,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-//    private final JwtConfigurer jwtConfigurer;
 
     private final JwtTokenFilter jwtTokenFilter;
+
+    private final JwtUserDetailsService jwtUserDetailsService;
+
+    private final PasswordEncoder passwordEncoder;
 
     private static final String MARKET_ENDPOINT = "/api/marketplaces/**";
     private static final String ACQUIRE_ENDPOINT = "/api/acquire/**";
@@ -28,8 +34,10 @@ public class SecurityConfig {
     private static final String USER_ENDPOINT = "/api/users/**";
 
 
-    public SecurityConfig(JwtTokenFilter jwtTokenFilter) {
+    public SecurityConfig(JwtTokenFilter jwtTokenFilter, JwtUserDetailsService jwtUserDetailsService, PasswordEncoder passwordEncoder) {
         this.jwtTokenFilter = jwtTokenFilter;
+        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
@@ -49,7 +57,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, MARKET_ENDPOINT).hasAuthority(Role.MARKET.name())
                         .requestMatchers(ACQUIRE_ENDPOINT).hasAuthority(Role.ACQUIRE.name())
                         .anyRequest().permitAll()
-                );
+                )
+                .authenticationProvider(authenticationProvider());
 
         return http.build();
     }
@@ -57,6 +66,16 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+        authProvider.setUserDetailsService(jwtUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+
+        return authProvider;
     }
 
 

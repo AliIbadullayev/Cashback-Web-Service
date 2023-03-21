@@ -2,10 +2,10 @@ package com.business.app.rest;
 
 
 import com.business.app.dto.AuthenticationRequestDto;
+import com.business.app.dto.RefreshTokenRequestDto;
 import com.business.app.dto.RegistrationRequestDto;
 import com.example.data.model.Actor;
 import com.example.data.model.User;
-//import com.example.data.model.XmlActor;
 import com.business.app.security.JwtTokenProvider;
 import com.business.app.service.ActorService;
 import com.example.data.model.XmlActor;
@@ -44,15 +44,27 @@ public class AuthenticationRestController {
 
     @PostMapping("login")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request) {
-
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername().trim(), request.getPassword()));
         Actor actor = actorService.getActor(request.getUsername().trim());
-        String token = jwtTokenProvider.createToken(request.getUsername().trim(), actor.getRole().name());
+        String accessToken = jwtTokenProvider.createAccessToken(request.getUsername().trim(), actor.getRole().name());
+        String refreshToken = jwtTokenProvider.createRefreshToken(request.getUsername().trim(), actor.getRole().name());
 
         Map<Object, Object> response = new HashMap<>();
         response.put("username", request.getUsername());
-        response.put("token", token);
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
         response.put("role", actor.getRole());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequestDto request) {
+        String accessToken = jwtTokenProvider.createAccessTokenByRefreshToken(request.getRefreshToken());
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", request.getRefreshToken());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
