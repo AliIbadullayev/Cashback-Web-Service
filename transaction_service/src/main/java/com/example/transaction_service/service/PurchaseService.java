@@ -46,6 +46,8 @@ public class PurchaseService {
     public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException, NotSupportedException {
         try {
             transactionManager.begin();
+
+
             Purchase purchase = new Purchase();
             Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
             if (checkTimeDeadline(redirect.getTime().getTime())) {
@@ -66,6 +68,7 @@ public class PurchaseService {
                 userRepository.save(user);
                 purchaseRepository.save(purchase);
                 redirectService.removeRedirect(redirect);
+                transactionManager.commit();
                 return purchase;
             } else {
                 throw new NotHandledPurchaseException("Not handled purchase because of time limit");
@@ -95,6 +98,7 @@ public class PurchaseService {
                         user.setPendingBalance(user.getPendingBalance() - purchase.getTotalPrice() * purchase.getCashbackPercent() / 100);
                         userRepository.save(user);
                         purchaseRepository.save(purchase);
+                        transactionManager.commit();
                     } else {
                         throw new NotHandledPurchaseException("Cannot handle with rejected or approved purchase!");
                     }

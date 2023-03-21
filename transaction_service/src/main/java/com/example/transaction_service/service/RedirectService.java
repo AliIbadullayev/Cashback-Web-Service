@@ -59,6 +59,7 @@ public class RedirectService {
         } catch (Exception e){
             transactionManager.rollback();
             throw new TransactionException("Ошибка выполнения транзакции: "+e.getMessage());
+
         }
     }
 
