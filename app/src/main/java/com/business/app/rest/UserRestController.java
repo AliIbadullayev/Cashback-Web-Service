@@ -9,14 +9,10 @@ import com.business.app.security.JwtTokenProvider;
 import com.business.app.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.data.model.User;
-
-import java.util.Objects;
 
 import java.util.Objects;
 
@@ -51,8 +47,7 @@ public class UserRestController {
                                          HttpServletRequest request) throws NotFoundRedirectException, IllegalAccessException{
         if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), redirectDto.getUserId()))
             throw new IllegalAccessException("У вас нет права на эту операцию");
-        log.info("Redirect method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(redirectService.addRedirect(redirectDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
+        return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
     }
 
     @GetMapping(value = "{username}/available-balance")

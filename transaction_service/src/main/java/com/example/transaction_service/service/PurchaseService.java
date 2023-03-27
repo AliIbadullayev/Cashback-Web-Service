@@ -11,9 +11,7 @@ import com.example.data.repository.UserRepository;
 import com.example.transaction_service.exception.TransactionException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.Transaction;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -43,7 +41,7 @@ public class PurchaseService {
         return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 3000;
     }
 
-    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException, NotSupportedException {
+    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException {
         try {
             transactionManager.begin();
 
@@ -80,7 +78,7 @@ public class PurchaseService {
 
     }
 
-    public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) throws SystemException, NotSupportedException {
+    public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) throws SystemException {
         try {
             transactionManager.begin();
             Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);

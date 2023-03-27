@@ -1,12 +1,7 @@
 package com.example.transaction_service.rest;
 
-import com.example.transaction_service.dto.RedirectDto;
 import com.example.transaction_service.dto.WithdrawDto;
-import com.example.transaction_service.exception.NotFoundRedirectException;
-import com.example.transaction_service.exception.NotFoundUserException;
 import com.example.transaction_service.service.*;
-import com.example.data.model.User;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +30,6 @@ public class UserRestController {
 
     @Autowired
     WithdrawService withdrawService;
-
-    @PostMapping("redirect")
-    public ResponseEntity<?> addRedirect(@RequestBody RedirectDto redirectDto, HttpServletRequest httpServletRequest) throws NotFoundRedirectException, SystemException, NotSupportedException {
-        return new ResponseEntity<>(redirectService.addRedirect(redirectDto), HttpStatus.OK);
-    }
 
     @PostMapping("withdraw")
     public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto) throws SystemException, NotSupportedException {

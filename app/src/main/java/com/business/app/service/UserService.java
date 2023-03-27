@@ -1,7 +1,6 @@
 package com.business.app.service;
 
 import com.business.app.exception.NotFoundUserException;
-import com.business.app.exception.UserAlreadyExistException;
 import com.example.data.model.User;
 import com.example.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

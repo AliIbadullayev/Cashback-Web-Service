@@ -12,6 +12,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 
 @Service
 public class RedirectService {
@@ -35,11 +38,22 @@ public class RedirectService {
     }
 
 
-    public Redirect addRedirect(RedirectDto redirectDto, String url, String token)  {
-        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<RedirectDto> entity = new HttpEntity<>(redirectDto, httpHeaders);
-        return restTemplate.postForObject(newUrl, entity, Redirect.class);
+    public Redirect addRedirect(RedirectDto redirectDto)  {
+        Redirect redirect = new Redirect();
+        User user = userService.getUser(redirectDto.getUserId());
+        Marketplace marketplace = marketplaceService.getMarketplace(redirectDto.getMarketplaceId());
+
+
+        if (user != null && marketplace != null) {
+            RedirectId redirectId = new RedirectId(user, marketplace);
+            redirect.setPk(redirectId);
+
+            redirect.setTime(Timestamp.valueOf(LocalDateTime.now()));
+            redirectRepository.save(redirect);
+            return redirect;
+        } else {
+            throw new NotFoundRedirectException("Not found user or marketplace");
+        }
     }
 
 

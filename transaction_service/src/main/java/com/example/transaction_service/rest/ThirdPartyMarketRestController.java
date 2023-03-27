@@ -4,7 +4,6 @@ import com.example.transaction_service.dto.PurchaseApproveDto;
 import com.example.transaction_service.dto.PurchaseFromMarketplaceDto;
 import com.example.transaction_service.exception.NotFoundRedirectException;
 import com.example.transaction_service.exception.NotHandledPurchaseException;
-import com.example.transaction_service.service.MarketplaceService;
 import com.example.transaction_service.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,11 +24,9 @@ public class ThirdPartyMarketRestController {
     @Autowired
     private final PurchaseService purchaseService;
 
-    private final MarketplaceService marketplaceService;
 
-    public ThirdPartyMarketRestController(PurchaseService purchaseService, MarketplaceService marketplaceService) {
+    public ThirdPartyMarketRestController(PurchaseService purchaseService) {
         this.purchaseService = purchaseService;
-        this.marketplaceService = marketplaceService;
     }
 
     @PostMapping("purchase")

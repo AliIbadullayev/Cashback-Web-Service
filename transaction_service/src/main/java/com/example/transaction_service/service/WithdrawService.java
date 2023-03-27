@@ -31,7 +31,7 @@ public class WithdrawService {
         this.transactionManager = transactionManager;
     }
 
-    public Withdraw sendWithdraw(WithdrawDto withdrawDto) throws SystemException, NotSupportedException {
+    public Withdraw sendWithdraw(WithdrawDto withdrawDto) throws SystemException {
         try {
             transactionManager.begin();
 

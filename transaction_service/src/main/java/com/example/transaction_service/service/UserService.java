@@ -1,7 +1,6 @@
 package com.example.transaction_service.service;
 
 import com.example.transaction_service.exception.NotFoundUserException;
-import com.example.transaction_service.exception.UserAlreadyExistException;
 import com.example.data.model.User;
 import com.example.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
