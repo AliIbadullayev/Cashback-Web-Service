@@ -37,4 +37,9 @@ public class Purchase {
     private double cashbackPercent;
 
     private double totalPrice;
+
+    private String stringIdentifier;
+
+    private String errorMessage;
+
 }

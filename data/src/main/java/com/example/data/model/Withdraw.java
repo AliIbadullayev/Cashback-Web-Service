@@ -32,4 +32,8 @@ public class Withdraw {
     private double amount;
 
 
+    private String stringIdentifier;
+
+    private String errorMessage;
+
 }

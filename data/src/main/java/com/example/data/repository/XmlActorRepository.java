@@ -55,9 +55,7 @@ public class XmlActorRepository{
         List<XmlActor> actors = findAll();
         actors.add(actor);
         try {
-            System.out.println("Маршализация "+getUsersFile());
             marshaller.marshal(new XmlActorsWrapper(actors), getUsersFile());
-            System.out.println("После маршализации ");
         } catch (JAXBException | IOException | URISyntaxException e) {
             throw new RuntimeException("Файл с данными учетных записей не найден!");
         }
