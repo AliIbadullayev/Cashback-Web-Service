@@ -6,6 +6,7 @@ import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
 import com.business.app.service.MarketplaceService;
 import com.business.app.service.PurchaseService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +42,18 @@ public class ThirdPartyMarketRestController {
 
     @PostMapping("purchase")
     public ResponseEntity<?> addPurchase(@RequestBody PurchaseFromMarketplaceDto purchaseFromMarketplaceDto,
-                                         HttpServletRequest request)  throws NotFoundRedirectException, NotHandledPurchaseException {
+                                         HttpServletRequest request) throws NotFoundRedirectException, NotHandledPurchaseException, JsonProcessingException {
         log.info("Purchase method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(purchaseService.purchaseAdd(purchaseFromMarketplaceDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
+        String id = purchaseService.purchaseAdd(purchaseFromMarketplaceDto);
+        return new ResponseEntity<>( "Заявка успешно отправлена: "+ id, HttpStatus.OK);
     }
 
     @PostMapping("purchase/{purchase_id}/approve")
-    public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") Long purchaseId,
+    public ResponseEntity<?> approvePurchase(@PathVariable(name = "purchase_id") String purchaseId,
                                              @RequestBody PurchaseApproveDto purchaseApproveDto,
-                                             HttpServletRequest request) {
+                                             HttpServletRequest request) throws JsonProcessingException {
         log.info("Purchase approve method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(purchaseService.approvePurchase(purchaseApproveDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
+        purchaseService.approvePurchase(purchaseId, purchaseApproveDto);
+        return new ResponseEntity<>( "Заявка успешно отправлена", HttpStatus.OK);
     }
 }

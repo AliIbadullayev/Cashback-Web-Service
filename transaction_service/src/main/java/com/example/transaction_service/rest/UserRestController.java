@@ -1,6 +1,6 @@
 package com.example.transaction_service.rest;
 
-import com.example.transaction_service.dto.WithdrawDto;
+import com.example.data.dto.WithdrawDto;
 import com.example.transaction_service.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

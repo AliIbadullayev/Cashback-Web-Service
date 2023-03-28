@@ -1,17 +1,20 @@
 package com.example.transaction_service.service;
 
 import bitronix.tm.BitronixTransactionManager;
-import com.example.transaction_service.dto.PurchaseApproveDto;
-import com.example.transaction_service.dto.PurchaseFromMarketplaceDto;
+import com.example.data.dto.PurchaseApproveDto;
+import com.example.data.dto.PurchaseFromMarketplaceDto;
 import com.example.transaction_service.exception.NotFoundRedirectException;
 import com.example.transaction_service.exception.NotHandledPurchaseException;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
 import com.example.transaction_service.exception.TransactionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.SystemException;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -41,19 +44,19 @@ public class PurchaseService {
         return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 3000;
     }
 
-    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws NotFoundRedirectException, NotHandledPurchaseException, SystemException {
+    public void purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws SystemException {
+        Purchase purchase = new Purchase();
+        Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
+        purchase.setStringIdentifier(purchaseFromMarketplaceDto.getStringIdentifier());
+        purchase.setUser(redirect.getPk().getUser());
+        purchase.setMarketplace(redirect.getPk().getMarketplace());
+        purchase.setTimestamp(Timestamp.from(Instant.now()));
+        purchase.setCashbackPercent(purchaseFromMarketplaceDto.getCashbackPercent());
+        purchase.setTotalPrice(purchaseFromMarketplaceDto.getTotalPrice());
         try {
             transactionManager.begin();
 
-
-            Purchase purchase = new Purchase();
-            Redirect redirect = redirectService.getRedirect(purchaseFromMarketplaceDto.getUsername(), purchaseFromMarketplaceDto.getMarketplaceId());
             if (checkTimeDeadline(redirect.getTime().getTime())) {
-                purchase.setUser(redirect.getPk().getUser());
-                purchase.setMarketplace(redirect.getPk().getMarketplace());
-                purchase.setTimestamp(Timestamp.from(Instant.now()));
-                purchase.setCashbackPercent(purchaseFromMarketplaceDto.getCashbackPercent());
-                purchase.setTotalPrice(purchaseFromMarketplaceDto.getTotalPrice());
                 User user = purchase.getUser();
                 if (checkRules(redirect.getPk().getMarketplace().getRules(), purchaseFromMarketplaceDto)) {
                     purchase.setCashbackPaymentStatus(Status.PENDING);
@@ -67,21 +70,23 @@ public class PurchaseService {
                 purchaseRepository.save(purchase);
                 redirectService.removeRedirect(redirect);
                 transactionManager.commit();
-                return purchase;
             } else {
                 throw new NotHandledPurchaseException("Not handled purchase because of time limit");
             }
         } catch (Exception e) {
             transactionManager.rollback();
+            purchase.setCashbackPaymentStatus(Status.REJECTED);
+            purchase.setErrorMessage(e.getCause().getMessage());
+            purchaseRepository.save(purchase);
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
-
     }
 
-    public Purchase approvePurchase(Long purchaseId, PurchaseApproveDto purchaseApproveDto) throws SystemException {
+    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto) throws SystemException {
+
         try {
             transactionManager.begin();
-            Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
+            Purchase purchase = purchaseRepository.findByStringIdentifier(purchaseApproveDto.getStringIdentifier()).orElse(null);
             if (purchase != null) {
 
                 if (purchase.getMarketplace().getId().equals(purchaseApproveDto.getMarketplaceId())) {
@@ -94,6 +99,7 @@ public class PurchaseService {
                             purchase.setCashbackPaymentStatus(Status.REJECTED);
                         }
                         user.setPendingBalance(user.getPendingBalance() - purchase.getTotalPrice() * purchase.getCashbackPercent() / 100);
+                        purchase.setErrorMessage(null);
                         userRepository.save(user);
                         purchaseRepository.save(purchase);
                         transactionManager.commit();

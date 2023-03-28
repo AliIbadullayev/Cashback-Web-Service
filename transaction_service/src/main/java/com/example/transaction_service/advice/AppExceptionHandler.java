@@ -1,30 +1,15 @@
 package com.example.transaction_service.advice;
 
-import com.example.transaction_service.exception.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ErrorHandler;
 
 
-@RestControllerAdvice
-public class AppExceptionHandler {
-    @ExceptionHandler({NotFoundRedirectException.class, NotFoundUserException.class,
-            NotFoundPaymentMethodException.class, ResourceNotFoundException.class, SystemException.class, NotSupportedException.class})
-    public ResponseEntity<?> handleNotFoundException(RuntimeException runtimeException) {
-        return new ResponseEntity<Object>(
-                runtimeException.getMessage(), HttpStatus.NOT_FOUND);
+@Slf4j
+@Service
+public class AppExceptionHandler implements ErrorHandler {
+    @Override
+    public void handleError(Throwable t) {
+        log.error(t.getCause().getMessage());
     }
-
-    @ExceptionHandler({UserAlreadyExistException.class, IllegalPageParametersException.class, NotHandledWithdrawException.class,
-            NotHandledPurchaseException.class, TransactionException.class})
-    public ResponseEntity<?> handleBadRequestException(RuntimeException runtimeException) {
-        return new ResponseEntity<Object>(
-                runtimeException.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-
 }

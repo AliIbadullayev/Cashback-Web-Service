@@ -4,13 +4,14 @@ import com.business.app.dto.PurchaseDto;
 import com.business.app.dto.PurchaseApproveDto;
 import com.business.app.dto.PurchaseFromMarketplaceDto;
 import com.business.app.exception.IllegalPageParametersException;
-import com.business.app.exception.NotFoundRedirectException;
-import com.business.app.exception.NotHandledPurchaseException;
 import com.business.app.exception.ResourceNotFoundException;
+import com.business.app.util.IdGenerator;
 import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,30 +38,44 @@ public class PurchaseService {
 
     private RestTemplate restTemplate;
 
+
+    private final JmsTemplate jmsTemplate;
+    private final ObjectMapper mapper;
+
+
     @PostConstruct
     public void init() {
         this.restTemplate = new RestTemplate();
     }
 
-    public PurchaseService(RedirectService redirectService, PurchaseRepository purchaseRepository, UserRepository userRepository, TransactionServiceRequestHandler transactionServiceRequestHandler) {
+    public PurchaseService(RedirectService redirectService, PurchaseRepository purchaseRepository, UserRepository userRepository, TransactionServiceRequestHandler transactionServiceRequestHandler, JmsTemplate jmsTemplate, ObjectMapper mapper) {
         this.redirectService = redirectService;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
         this.transactionServiceRequestHandler = transactionServiceRequestHandler;
+        this.jmsTemplate = jmsTemplate;
+        this.mapper = mapper;
     }
 
-    public Purchase purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto, String url, String token)  {
-        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto, httpHeaders);
-        return restTemplate.postForObject(newUrl, entity, Purchase.class);
+    public String purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws JsonProcessingException {
+        String id = IdGenerator.generateId();
+        purchaseFromMarketplaceDto.setStringIdentifier(id);
+        jmsTemplate.convertAndSend("purchase_add", mapper.writeValueAsString(purchaseFromMarketplaceDto));
+        return id;
+//        System.out.println(jmsTemplate.receive("purchase_add"));
+//        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
+//        String newUrl = transactionServiceRequestHandler.generateUrl(url);
+//        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto, httpHeaders);
+//        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
-    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto, String url, String token)  {
-        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto, httpHeaders);
-        return restTemplate.postForObject(newUrl, entity, Purchase.class);
+    public void approvePurchase(String purchaseId, PurchaseApproveDto purchaseApproveDto) throws JsonProcessingException {
+        purchaseApproveDto.setStringIdentifier(purchaseId);
+        jmsTemplate.convertAndSend("purchase_approve", mapper.writeValueAsString(purchaseApproveDto));
+//        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
+//        String newUrl = transactionServiceRequestHandler.generateUrl(url);
+//        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto, httpHeaders);
+//        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
 

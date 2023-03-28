@@ -17,4 +17,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @EntityGraph(attributePaths = {"user", "marketplace.rules"})
     @Override
     Optional<Purchase> findById(Long aLong);
+
+    @EntityGraph(attributePaths = {"user", "marketplace.rules"})
+    Optional<Purchase> findByStringIdentifier(String strId);
 }

@@ -1,8 +1,8 @@
 package com.example.transaction_service.service;
 
 import bitronix.tm.BitronixTransactionManager;
-import com.example.transaction_service.dto.WithdrawApproveDto;
-import com.example.transaction_service.dto.WithdrawDto;
+import com.example.data.dto.WithdrawApproveDto;
+import com.example.data.dto.WithdrawDto;
 import com.example.transaction_service.exception.NotHandledWithdrawException;
 import com.example.data.model.*;
 import com.example.data.repository.WithdrawRepository;

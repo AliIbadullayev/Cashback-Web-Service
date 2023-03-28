@@ -11,4 +11,8 @@ public interface WithdrawRepository extends JpaRepository<Withdraw, Long> {
     @EntityGraph(attributePaths = {"user", "paymentMethod"})
     @Override
     Optional<Withdraw> findById(Long aLong);
+
+
+    @EntityGraph(attributePaths = {"user", "paymentMethod"})
+    Optional<Withdraw> findByStringIdentifier(String strId);
 }
