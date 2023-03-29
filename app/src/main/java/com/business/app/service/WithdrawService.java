@@ -1,49 +1,53 @@
 package com.business.app.service;
 
+import com.business.app.util.IdGenerator;
+import com.example.data.dto.WithdrawApproveDto;
+import com.example.data.dto.WithdrawDto;
 import com.example.data.dto.WithdrawApproveDto;
 import com.example.data.dto.WithdrawDto;
 import com.business.app.exception.NotHandledWithdrawException;
 import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.WithdrawRepository;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WithdrawService {
-    @Autowired
-    WithdrawRepository withdrawRepository;
 
-    @Autowired
-    UserService userService;
+    @Value("${withdraw.send.queue}")
+    private String sendWithdrawQueue;
+    @Value("${withdraw.approve.queue}")
 
-    @Autowired
-    PaymentMethodService paymentMethodService;
+    private String approveWithdrawQueue;
+    private final WithdrawRepository withdrawRepository;
 
-    @Autowired
-    TransactionServiceRequestHandler transactionServiceRequestHandler;
+    private final TransactionServiceRequestHandler transactionServiceRequestHandler;
 
-    private RestTemplate restTemplate;
+    private final JmsTemplate jmsTemplate;
 
 
-    @PostConstruct
-    public void init() {
-        this.restTemplate = new RestTemplate();
+
+    public WithdrawService(WithdrawRepository withdrawRepository, TransactionServiceRequestHandler transactionServiceRequestHandler, JmsTemplate jmsTemplate) {
+        this.withdrawRepository = withdrawRepository;
+        this.transactionServiceRequestHandler = transactionServiceRequestHandler;
+        this.jmsTemplate = jmsTemplate;
     }
 
-    public Withdraw sendWithdraw(WithdrawDto withdrawDto, String url, String token)  {
-        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<WithdrawDto> entity = new HttpEntity<>(withdrawDto, httpHeaders);
-        return restTemplate.postForObject(newUrl, entity, Withdraw.class);
+    public String sendWithdraw(WithdrawDto withdrawDto)  {
+        String id = IdGenerator.generateId();
+        withdrawDto.setStringIdentifier(id);
+        jmsTemplate.convertAndSend(sendWithdrawQueue,withdrawDto);
+        return id;
     }
 
-    public Withdraw getWithdraw(Long id) {
-        Withdraw withdraw = withdrawRepository.findById(id).orElse(null);
+    public Withdraw getWithdraw(String id) {
+        Withdraw withdraw = withdrawRepository.findByStringIdentifier(id).orElse(null);
+        System.out.println(withdraw);
         if (withdraw != null) {
             return withdraw;
         } else {
@@ -51,10 +55,8 @@ public class WithdrawService {
         }
     }
 
-    public Withdraw approveWithdraw(WithdrawApproveDto withdrawApproveDto, String url, String token)  {
-        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-        HttpEntity<WithdrawApproveDto> entity = new HttpEntity<>(withdrawApproveDto, httpHeaders);
-        return restTemplate.postForObject(newUrl, entity, Withdraw.class);
+    public void approveWithdraw(WithdrawApproveDto withdrawApproveDto, String stringIdentifier)  {
+        withdrawApproveDto.setStringIdentifier(stringIdentifier);
+        jmsTemplate.convertAndSend(approveWithdrawQueue,withdrawApproveDto);
     }
 }

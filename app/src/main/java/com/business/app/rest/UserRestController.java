@@ -7,6 +7,7 @@ import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotFoundUserException;
 import com.business.app.security.JwtTokenProvider;
 import com.business.app.service.*;
+import com.example.data.model.Withdraw;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.data.model.User;
 
 import java.util.Objects;
+
 
 /**
  * Контроллер для запросов со стороны пользователя
@@ -79,17 +81,25 @@ public class UserRestController {
                                              @RequestParam("size") int size,
                                              HttpServletRequest request) throws NotFoundUserException, IllegalAccessException {
 
-        if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), username)) throw new IllegalAccessException("У вас нет права на эту операцию");
+        if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), username))
+            throw new IllegalAccessException("У вас нет права на эту операцию");
         User user = userService.getUser(username);
         return new ResponseEntity<>(purchaseService.getPurchasePage(user, page, size), HttpStatus.OK);
     }
 
     @PostMapping("withdraw")
-    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto,
-                                          HttpServletRequest request) throws IllegalAccessException{
-        if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), withdrawDto.getUsername())) throw new IllegalAccessException("У вас нет права на эту операцию");
-        log.info("Withdraw method called with url: {}", request.getRequestURL());
-        return new ResponseEntity<>(withdrawService.sendWithdraw(withdrawDto, request.getRequestURL().toString(), request.getHeader("Authorization")), HttpStatus.OK);
+    public String makeWithdraw(@RequestBody WithdrawDto withdrawDto,
+                                          HttpServletRequest request) throws IllegalAccessException {
+        if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), withdrawDto.getUsername()))
+            throw new IllegalAccessException("У вас нет права на эту операцию");
+        log.info("Withdraw method called");
+        return "Заявка на вывод отправлена. Её номер: " + withdrawService.sendWithdraw(withdrawDto);
+    }
+
+
+    @GetMapping("withdraw/{id}")
+    public Withdraw getWithdraw(@PathVariable String id){
+        return withdrawService.getWithdraw(id);
     }
 
 }

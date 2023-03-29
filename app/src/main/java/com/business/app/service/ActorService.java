@@ -12,13 +12,14 @@ import com.example.data.repository.ActorRepository;
 import com.example.data.repository.MarketplaceRepository;
 import com.example.data.repository.UserRepository;
 import com.example.data.repository.XmlActorRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ActorService {
 
-    MarketplaceRepository marketplaceRepository;
     private final ActorRepository actorRepository;
 
     private final XmlActorRepository xmlActorRepository;
@@ -106,7 +107,7 @@ public class ActorService {
     }
 
     public void saveXmlActor(XmlActor xmlActor) {
-        System.out.println("save xml actor");
+        log.info("save new actor to xml with username "+xmlActor.getUsername());
         xmlActorRepository.save(xmlActor);
     }
 

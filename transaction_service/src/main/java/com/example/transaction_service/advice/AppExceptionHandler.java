@@ -10,6 +10,6 @@ import org.springframework.util.ErrorHandler;
 public class AppExceptionHandler implements ErrorHandler {
     @Override
     public void handleError(Throwable t) {
-        log.error(t.getCause().getMessage());
+        log.error(t.getMessage());
     }
 }

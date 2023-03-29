@@ -32,6 +32,7 @@ public class SecurityConfig {
     private static final String ACQUIRE_ENDPOINT = "/api/acquire/**";
     private static final String AUTH_ENDPOINT = "/api/auth/**";
     private static final String USER_ENDPOINT = "/api/users/**";
+    private static final String TEST_ENDPOINT = "/api/test/**";
 
 
     public SecurityConfig(JwtTokenFilter jwtTokenFilter, JwtUserDetailsService jwtUserDetailsService, PasswordEncoder passwordEncoder) {
@@ -52,6 +53,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(AUTH_ENDPOINT).permitAll()
+                        .requestMatchers(TEST_ENDPOINT).permitAll()
                         .requestMatchers(USER_ENDPOINT).hasAuthority(Role.USER.name())
                         .requestMatchers(HttpMethod.GET, MARKET_ENDPOINT).hasAuthority(Role.USER.name())
                         .requestMatchers(HttpMethod.POST, MARKET_ENDPOINT).hasAuthority(Role.MARKET.name())

@@ -32,21 +32,22 @@ public class WithdrawService {
     }
 
     public Withdraw sendWithdraw(WithdrawDto withdrawDto) throws SystemException {
+        Withdraw withdraw = new Withdraw();
+        withdraw.setStringIdentifier(withdrawDto.getStringIdentifier());
+        withdraw.setAmount(withdrawDto.getAmount());
+        withdraw.setTime(Timestamp.from(Instant.now()));
+        withdraw.setWithdrawStatus(Status.PENDING);
+        withdraw.setCredential(withdrawDto.getCredential());
+
         try {
             transactionManager.begin();
-
             User user = userService.getUser(withdrawDto.getUsername());
             PaymentMethod paymentMethod = paymentMethodService.getPaymentMethod(withdrawDto.getPaymentMethodId());
 
-            Withdraw withdraw = new Withdraw();
             if (withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100 <= user.getAvailableBalance()) {
                 if (checkPaymentMethod(withdrawDto.getCredential(), paymentMethod.getType())) {
                     if (withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100 >= paymentMethod.getMinAmount()) {
-                        withdraw.setWithdrawStatus(Status.PENDING);
-                        withdraw.setAmount(withdrawDto.getAmount());
-                        withdraw.setTime(Timestamp.from(Instant.now()));
                         withdraw.setUser(user);
-                        withdraw.setCredential(withdrawDto.getCredential());
                         withdraw.setPaymentMethod(paymentMethod);
                         user.setAvailableBalance(user.getAvailableBalance() - withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100);
                         withdrawRepository.save(withdraw);
@@ -64,12 +65,14 @@ public class WithdrawService {
             return withdraw;
         } catch (Exception e) {
             transactionManager.rollback();
+            withdraw.setErrorMessage("Error creating withdraw");
+            withdrawRepository.save(withdraw);
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }
 
-    public Withdraw getWithdraw(Long id) {
-        Withdraw withdraw = withdrawRepository.findById(id).orElse(null);
+    public Withdraw getWithdraw(String id) {
+        Withdraw withdraw = withdrawRepository.findByStringIdentifier(id).orElse(null);
         if (withdraw != null) {
             return withdraw;
         } else {
@@ -77,10 +80,10 @@ public class WithdrawService {
         }
     }
 
-    public Withdraw approveWithdraw(Long withdrawId, WithdrawApproveDto withdrawApproveDto) throws SystemException, NotSupportedException {
-        transactionManager.begin();
+    public void approveWithdraw(WithdrawApproveDto withdrawApproveDto) throws SystemException, NotSupportedException {
         try {
-            Withdraw withdraw = getWithdraw(withdrawId);
+            Withdraw withdraw = getWithdraw(withdrawApproveDto.getStringIdentifier());
+            transactionManager.begin();
             User user = withdraw.getUser();
             double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
             if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
@@ -93,11 +96,16 @@ public class WithdrawService {
             }
             userService.saveUser(user);
             withdraw.setUser(user);
+            withdraw.setErrorMessage(null);
             withdrawRepository.save(withdraw);
             transactionManager.commit();
-            return withdraw;
-        } catch (Exception e) {
+        } catch (Exception e){
             transactionManager.rollback();
+            if (!(e instanceof NotHandledWithdrawException)){
+                Withdraw withdraw = getWithdraw(withdrawApproveDto.getStringIdentifier());
+                withdraw.setErrorMessage("Approving error");
+                withdrawRepository.save(withdraw);
+            }
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }

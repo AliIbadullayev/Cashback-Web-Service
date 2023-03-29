@@ -1,4 +1,4 @@
-package com.example.transaction_service.rest;
+package com.example.transaction_service.jms;
 
 import com.example.data.dto.PurchaseApproveDto;
 import com.example.data.dto.PurchaseFromMarketplaceDto;

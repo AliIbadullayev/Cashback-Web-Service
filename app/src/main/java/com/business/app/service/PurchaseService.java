@@ -1,5 +1,6 @@
 package com.business.app.service;
 
+import com.business.app.util.IdGenerator;
 import com.example.data.dto.PurchaseDto;
 import com.example.data.dto.PurchaseApproveDto;
 import com.example.data.dto.PurchaseFromMarketplaceDto;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

@@ -3,6 +3,7 @@ package com.example.transaction_service.config;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
+//import com.example.transaction_service.advice.AppExceptionHandler;
 import com.example.transaction_service.advice.AppExceptionHandler;
 import jakarta.jms.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
