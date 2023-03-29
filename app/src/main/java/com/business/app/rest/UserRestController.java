@@ -1,6 +1,7 @@
 package com.business.app.rest;
 
 import com.example.data.dto.RedirectDto;
+import com.example.data.dto.SuccessResponseDto;
 import com.example.data.dto.WithdrawDto;
 import com.business.app.exception.IllegalAccessException;
 import com.business.app.exception.NotFoundRedirectException;
@@ -88,12 +89,14 @@ public class UserRestController {
     }
 
     @PostMapping("withdraw")
-    public String makeWithdraw(@RequestBody WithdrawDto withdrawDto,
+    public ResponseEntity<?> makeWithdraw(@RequestBody WithdrawDto withdrawDto,
                                           HttpServletRequest request) throws IllegalAccessException {
         if (!Objects.equals(jwtTokenProvider.getUsernameFromToken(jwtTokenProvider.resolveToken(request)), withdrawDto.getUsername()))
             throw new IllegalAccessException("У вас нет права на эту операцию");
         log.info("Withdraw method called");
-        return "Заявка на вывод отправлена. Её номер: " + withdrawService.sendWithdraw(withdrawDto);
+        SuccessResponseDto successResponseDto = new SuccessResponseDto();
+        successResponseDto.setMessage("Заявка успешно отправлена: "+ withdrawService.sendWithdraw(withdrawDto));
+        return new ResponseEntity<>(successResponseDto, HttpStatus.OK);
     }
 
 

@@ -7,6 +7,7 @@ import com.example.transaction_service.exception.NotHandledWithdrawException;
 import com.example.data.model.*;
 import com.example.data.repository.WithdrawRepository;
 import com.example.transaction_service.exception.TransactionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.NotSupportedException;
@@ -14,6 +15,7 @@ import javax.transaction.SystemException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+@Slf4j
 @Service
 public class WithdrawService {
     private final WithdrawRepository withdrawRepository;
@@ -52,6 +54,7 @@ public class WithdrawService {
                         user.setAvailableBalance(user.getAvailableBalance() - withdrawDto.getAmount() * (100 + paymentMethod.getFee()) / 100);
                         withdrawRepository.save(withdraw);
                         userService.saveUser(user);
+                        log.info("Заявка на вывод успешно добавлена: "+withdrawDto.getStringIdentifier());
                         transactionManager.commit();
                     } else {
                         throw new NotHandledWithdrawException("Insufficient amount to withdraw! Min amount to withdraw is: " + paymentMethod.getMinAmount());
@@ -65,13 +68,14 @@ public class WithdrawService {
             return withdraw;
         } catch (Exception e) {
             transactionManager.rollback();
-            withdraw.setErrorMessage("Error creating withdraw");
+            withdraw.setErrorMessage(e.getMessage());
             withdrawRepository.save(withdraw);
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }
 
     public Withdraw getWithdraw(String id) {
+        System.out.println();
         Withdraw withdraw = withdrawRepository.findByStringIdentifier(id).orElse(null);
         if (withdraw != null) {
             return withdraw;
@@ -84,6 +88,7 @@ public class WithdrawService {
         try {
             Withdraw withdraw = getWithdraw(withdrawApproveDto.getStringIdentifier());
             transactionManager.begin();
+            if (withdraw.getErrorMessage() != null) throw new NotHandledWithdrawException("This withdraw has errors and couldn't be approved!");
             User user = withdraw.getUser();
             double withdrawAmount = withdraw.getAmount() * (100 + withdraw.getPaymentMethod().getFee()) / 100;
             if (!withdraw.getWithdrawStatus().equals(Status.PENDING))
@@ -98,14 +103,10 @@ public class WithdrawService {
             withdraw.setUser(user);
             withdraw.setErrorMessage(null);
             withdrawRepository.save(withdraw);
+            log.info("Заявка на вывод подтверждена успешно: "+withdrawApproveDto.getStringIdentifier());
             transactionManager.commit();
         } catch (Exception e){
             transactionManager.rollback();
-            if (!(e instanceof NotHandledWithdrawException)){
-                Withdraw withdraw = getWithdraw(withdrawApproveDto.getStringIdentifier());
-                withdraw.setErrorMessage("Approving error");
-                withdrawRepository.save(withdraw);
-            }
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }

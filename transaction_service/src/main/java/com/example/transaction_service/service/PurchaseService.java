@@ -8,13 +8,14 @@ import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
 import com.example.transaction_service.exception.TransactionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.SystemException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-
+@Slf4j
 @Service
 public class PurchaseService {
     private final RedirectService redirectService;
@@ -65,6 +66,7 @@ public class PurchaseService {
                 userRepository.save(user);
                 purchaseRepository.save(purchase);
                 redirectService.removeRedirect(redirect);
+                log.info("Покупка совершена успешно: "+purchaseFromMarketplaceDto.getStringIdentifier());
                 transactionManager.commit();
             } else {
                 throw new NotHandledPurchaseException("Not handled purchase because of time limit");
@@ -83,7 +85,7 @@ public class PurchaseService {
             transactionManager.begin();
             Purchase purchase = purchaseRepository.findByStringIdentifier(purchaseApproveDto.getStringIdentifier()).orElse(null);
             if (purchase != null) {
-
+                if (purchase.getErrorMessage() != null) throw new NotHandledPurchaseException("This purchase has errors and couldn't be approved!");
                 if (purchase.getMarketplace().getId().equals(purchaseApproveDto.getMarketplaceId())) {
                     if (purchase.isRulesRespected() && purchase.getCashbackPaymentStatus() == Status.PENDING) {
                         User user = purchase.getUser();
@@ -97,6 +99,7 @@ public class PurchaseService {
                         purchase.setErrorMessage(null);
                         userRepository.save(user);
                         purchaseRepository.save(purchase);
+                        log.info("Покупка подтверждена успешно: "+purchaseApproveDto.getStringIdentifier());
                         transactionManager.commit();
                     } else {
                         throw new NotHandledPurchaseException("Cannot handle with rejected or approved purchase!");

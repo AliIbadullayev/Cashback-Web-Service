@@ -48,7 +48,7 @@ public class ThirdPartyMarketRestController {
         String id = purchaseService.purchaseAdd(purchaseFromMarketplaceDto);
         SuccessResponseDto successResponseDto = new SuccessResponseDto();
         successResponseDto.setMessage("Заявка успешно отправлена: "+ id);
-        return new ResponseEntity<>( successResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(successResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("purchase/{purchase_id}/approve")
