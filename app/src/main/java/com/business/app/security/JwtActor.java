@@ -1,7 +1,6 @@
 package com.business.app.security;
 
 import com.example.data.model.Actor;
-//import com.example.data.model.XmlActor;
 import com.example.data.model.XmlActor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

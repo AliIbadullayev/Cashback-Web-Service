@@ -1,6 +1,6 @@
 package com.business.app.rest;
 
-import com.business.app.dto.WithdrawApproveDto;
+import com.example.data.dto.WithdrawApproveDto;
 import com.business.app.service.WithdrawService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

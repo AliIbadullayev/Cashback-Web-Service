@@ -1,7 +1,7 @@
 package com.business.app.rest;
 
-import com.business.app.dto.RedirectDto;
-import com.business.app.dto.WithdrawDto;
+import com.example.data.dto.RedirectDto;
+import com.example.data.dto.WithdrawDto;
 import com.business.app.exception.IllegalAccessException;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotFoundUserException;

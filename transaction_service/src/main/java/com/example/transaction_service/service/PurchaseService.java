@@ -3,18 +3,14 @@ package com.example.transaction_service.service;
 import bitronix.tm.BitronixTransactionManager;
 import com.example.data.dto.PurchaseApproveDto;
 import com.example.data.dto.PurchaseFromMarketplaceDto;
-import com.example.transaction_service.exception.NotFoundRedirectException;
 import com.example.transaction_service.exception.NotHandledPurchaseException;
 import com.example.data.model.*;
 import com.example.data.repository.PurchaseRepository;
 import com.example.data.repository.UserRepository;
 import com.example.transaction_service.exception.TransactionException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.SystemException;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -41,7 +37,7 @@ public class PurchaseService {
     }
 
     private boolean checkTimeDeadline(long started) {
-        return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 3000;
+        return (Timestamp.from(Instant.now()).getTime() - started) / 1000 <= 300;
     }
 
     public void purchaseAdd(PurchaseFromMarketplaceDto purchaseFromMarketplaceDto) throws SystemException {
@@ -76,14 +72,13 @@ public class PurchaseService {
         } catch (Exception e) {
             transactionManager.rollback();
             purchase.setCashbackPaymentStatus(Status.REJECTED);
-            purchase.setErrorMessage(e.getCause().getMessage());
+            purchase.setErrorMessage(e.getMessage());
             purchaseRepository.save(purchase);
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());
         }
     }
 
-    public Purchase approvePurchase(PurchaseApproveDto purchaseApproveDto) throws SystemException {
-
+    public void approvePurchase(PurchaseApproveDto purchaseApproveDto) throws SystemException {
         try {
             transactionManager.begin();
             Purchase purchase = purchaseRepository.findByStringIdentifier(purchaseApproveDto.getStringIdentifier()).orElse(null);
@@ -112,7 +107,6 @@ public class PurchaseService {
             } else {
                 throw new NotHandledPurchaseException("Cannot find purchase with this id");
             }
-            return purchase;
         } catch (Exception e) {
             transactionManager.rollback();
             throw new TransactionException("Ошибка выполнения транзакции: " + e.getMessage());

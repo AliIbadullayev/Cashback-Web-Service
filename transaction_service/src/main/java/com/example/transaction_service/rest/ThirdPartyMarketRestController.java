@@ -9,20 +9,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
 
 /**
  * Контроллер для запросов со стороны стороннего маркетплейса
  */
-@RestController
-@RequestMapping(value = "/api/transaction/marketplaces")
+@Service
 public class ThirdPartyMarketRestController {
 
     @Autowired

@@ -1,8 +1,8 @@
 package com.business.app.service;
 
-import com.business.app.dto.PurchaseDto;
-import com.business.app.dto.PurchaseApproveDto;
-import com.business.app.dto.PurchaseFromMarketplaceDto;
+import com.example.data.dto.PurchaseDto;
+import com.example.data.dto.PurchaseApproveDto;
+import com.example.data.dto.PurchaseFromMarketplaceDto;
 import com.business.app.exception.IllegalPageParametersException;
 import com.business.app.exception.ResourceNotFoundException;
 import com.business.app.util.IdGenerator;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -62,20 +60,11 @@ public class PurchaseService {
         purchaseFromMarketplaceDto.setStringIdentifier(id);
         jmsTemplate.convertAndSend("purchase_add", mapper.writeValueAsString(purchaseFromMarketplaceDto));
         return id;
-//        System.out.println(jmsTemplate.receive("purchase_add"));
-//        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-//        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-//        HttpEntity<PurchaseFromMarketplaceDto> entity = new HttpEntity<>(purchaseFromMarketplaceDto, httpHeaders);
-//        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
     public void approvePurchase(String purchaseId, PurchaseApproveDto purchaseApproveDto) throws JsonProcessingException {
         purchaseApproveDto.setStringIdentifier(purchaseId);
         jmsTemplate.convertAndSend("purchase_approve", mapper.writeValueAsString(purchaseApproveDto));
-//        HttpHeaders httpHeaders = transactionServiceRequestHandler.generateHttpHeader(token);
-//        String newUrl = transactionServiceRequestHandler.generateUrl(url);
-//        HttpEntity<PurchaseApproveDto> entity = new HttpEntity<>(purchaseApproveDto, httpHeaders);
-//        return restTemplate.postForObject(newUrl, entity, Purchase.class);
     }
 
 

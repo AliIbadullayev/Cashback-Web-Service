@@ -1,9 +1,8 @@
 package com.business.app.rest;
 
-
-import com.business.app.dto.AuthenticationRequestDto;
-import com.business.app.dto.RefreshTokenRequestDto;
-import com.business.app.dto.RegistrationRequestDto;
+import com.example.data.dto.AuthenticationRequestDto;
+import com.example.data.dto.RefreshTokenRequestDto;
+import com.example.data.dto.RegistrationRequestDto;
 import com.example.data.model.Actor;
 import com.example.data.model.User;
 import com.business.app.security.JwtTokenProvider;

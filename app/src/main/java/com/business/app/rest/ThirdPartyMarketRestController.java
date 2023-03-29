@@ -1,11 +1,12 @@
 package com.business.app.rest;
 
-import com.business.app.dto.PurchaseApproveDto;
-import com.business.app.dto.PurchaseFromMarketplaceDto;
+import com.example.data.dto.PurchaseApproveDto;
+import com.example.data.dto.PurchaseFromMarketplaceDto;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.exception.NotHandledPurchaseException;
 import com.business.app.service.MarketplaceService;
 import com.business.app.service.PurchaseService;
+import com.example.data.dto.SuccessResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,9 @@ public class ThirdPartyMarketRestController {
                                          HttpServletRequest request) throws NotFoundRedirectException, NotHandledPurchaseException, JsonProcessingException {
         log.info("Purchase method called with url: {}", request.getRequestURL());
         String id = purchaseService.purchaseAdd(purchaseFromMarketplaceDto);
-        return new ResponseEntity<>( "Заявка успешно отправлена: "+ id, HttpStatus.OK);
+        SuccessResponseDto successResponseDto = new SuccessResponseDto();
+        successResponseDto.setMessage("Заявка успешно отправлена: "+ id);
+        return new ResponseEntity<>( successResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("purchase/{purchase_id}/approve")
@@ -54,6 +57,8 @@ public class ThirdPartyMarketRestController {
                                              HttpServletRequest request) throws JsonProcessingException {
         log.info("Purchase approve method called with url: {}", request.getRequestURL());
         purchaseService.approvePurchase(purchaseId, purchaseApproveDto);
-        return new ResponseEntity<>( "Заявка успешно отправлена", HttpStatus.OK);
+        SuccessResponseDto successResponseDto = new SuccessResponseDto();
+        successResponseDto.setMessage("Заявка успешно отправлена");
+        return new ResponseEntity<>( successResponseDto, HttpStatus.OK);
     }
 }

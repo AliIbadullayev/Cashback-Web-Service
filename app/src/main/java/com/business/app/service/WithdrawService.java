@@ -1,7 +1,7 @@
 package com.business.app.service;
 
-import com.business.app.dto.WithdrawApproveDto;
-import com.business.app.dto.WithdrawDto;
+import com.example.data.dto.WithdrawApproveDto;
+import com.example.data.dto.WithdrawDto;
 import com.business.app.exception.NotHandledWithdrawException;
 import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;

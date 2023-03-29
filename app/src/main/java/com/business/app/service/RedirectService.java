@@ -1,21 +1,20 @@
 package com.business.app.service;
 
-import com.business.app.dto.RedirectDto;
+import com.example.data.dto.RedirectDto;
 import com.business.app.exception.NotFoundRedirectException;
 import com.business.app.util.TransactionServiceRequestHandler;
 import com.example.data.model.*;
 import com.example.data.repository.RedirectRepository;
-import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
-
+@Slf4j
 @Service
 public class RedirectService {
     @Autowired
@@ -29,14 +28,6 @@ public class RedirectService {
 
     @Autowired
     TransactionServiceRequestHandler transactionServiceRequestHandler;
-
-    private RestTemplate restTemplate;
-
-    @PostConstruct
-    public void init() {
-        this.restTemplate = new RestTemplate();
-    }
-
 
     public Redirect addRedirect(RedirectDto redirectDto)  {
         Redirect redirect = new Redirect();
@@ -76,6 +67,21 @@ public class RedirectService {
 
     public void removeRedirect(Redirect redirect) throws NotFoundRedirectException {
         redirectRepository.delete(redirect);
+    }
+
+    @Scheduled(fixedRate = 600000)
+    public void removeUnusedRedirects(){
+        int count = 0;
+        for (Redirect redirect: redirectRepository.findAll()){
+            if ((Timestamp.from(Instant.now()).getTime() - redirect.getTime().getTime()) / 1000 > 300){
+                removeRedirect(redirect);
+                count++;
+            }
+        }
+        if (count == 0)
+            log.info("Scheduled redirects cleaning task: Not found unused redirects");
+        else
+            log.info("Scheduled redirects cleaning task: Successfully cleaned {} unused redirects", count);
     }
 
 }
