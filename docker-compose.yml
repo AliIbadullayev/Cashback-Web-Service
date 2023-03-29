@@ -5,7 +5,8 @@ services:
     container_name: app
     depends_on:
       - db
-      - transaction  
+      - transaction
+      - artemis  
     ports:
       - 8779:8779
     environment:
@@ -13,8 +14,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=2281337
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - transaction.service.host
       - TRANSACTION_SERVICE_HOST=transaction
+      - SPRING_ARTEMIS_USER=artemis
+      - SPRING_ARTEMIS_PASSWORD=2281337
+      - SPRING_ARTEMIS_BROKERURL=tcp://artemis:61616
     volumes:
       - xml-data:/data
 
@@ -23,7 +26,8 @@ services:
     build: ./transaction_service/
     container_name: transaction
     depends_on:
-      - db 
+      - db
+      - artemis 
     ports:
       - 8081:8081
     environment:
@@ -31,6 +35,9 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=2281337
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_ARTEMIS_USER=artemis
+      - SPRING_ARTEMIS_PASSWORD=2281337
+      - SPRING_ARTEMIS_BROKERURL=tcp://artemis:61616
 
   db:
     image: postgres:15
@@ -42,6 +49,18 @@ services:
       - POSTGRES_PASSWORD=2281337
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  artemis:
+    image: vromero/activemq-artemis
+    container_name: artemis
+    ports:
+      - 8161:8161
+      - 61616:61616
+      - 5762:5762
+    environment:
+      - ARTEMIS_USERNAME=artemis
+      - ARTEMIS_PASSWORD=2281337
+
 
 volumes:
   postgres-data:
