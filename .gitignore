@@ -16,3 +16,9 @@
 
 /app/data/actors.xml
 /apigateway/src/test/java/com/business/apigateway/ApigatewayApplicationTests.java
+/.idea/**
+/.idea/
+/btm1.tlog
+/btm2.tlog
+/configserver/mvnw
+/configserver/mvnw.cmd

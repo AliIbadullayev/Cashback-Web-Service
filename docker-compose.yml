@@ -1,4 +1,22 @@
 services:
+
+  config:
+    image: config-image
+    build: ./configserver/
+    container_name: config
+    depends_on:
+      - consul
+    ports:
+      - 8888:8888
+    environment:
+      - spring_cloud_config_server_git_uri=https://github.com/AliIbadullayev/Cashback-Config-Repository
+      - SPRING_CLOUD_CONSUL_HOST=consul
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://config:8888" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   app:
     image: app-image 
     build: ./app/
@@ -6,9 +24,12 @@ services:
     depends_on:
       - db
       - transaction
-      - artemis  
+      - artemis
+      - config
+      - consul
     ports:
       - 8779:8779
+    restart: on-failure
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -18,6 +39,8 @@ services:
       - SPRING_ARTEMIS_USER=artemis
       - SPRING_ARTEMIS_PASSWORD=2281337
       - SPRING_ARTEMIS_BROKERURL=tcp://artemis:61616
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config:8888/config
     volumes:
       - xml-data:/data
 
@@ -27,7 +50,9 @@ services:
     container_name: transaction
     depends_on:
       - db
-      - artemis 
+      - artemis
+      - config
+      - consul
     ports:
       - 8081:8081
     environment:
@@ -38,6 +63,22 @@ services:
       - SPRING_ARTEMIS_USER=artemis
       - SPRING_ARTEMIS_PASSWORD=2281337
       - SPRING_ARTEMIS_BROKERURL=tcp://artemis:61616
+      - SPRING_CLOUD_CONSUL_HOST=consul
+
+
+  gateway:
+    image: apigateway-image
+    build: ./apigateway/
+    container_name: gateway
+    depends_on:
+      - db
+      - artemis
+      - consul
+    ports:
+      - 8090:8090
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=consul
+
 
   db:
     image: postgres:15
@@ -50,6 +91,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+
   artemis:
     image: vromero/activemq-artemis
     container_name: artemis
@@ -60,6 +102,15 @@ services:
     environment:
       - ARTEMIS_USERNAME=artemis
       - ARTEMIS_PASSWORD=2281337
+
+
+
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - 8500:8500
+
 
 
 volumes:
